@@ -98,10 +98,24 @@ class ShiftImport implements ToCollection, WithHeadingRow, SkipsOnError, WithChu
                 $groupWs = null;
             }
 
+            $rawWstText = $get(['wst_text', 'description', 'keterangan', 'keterangan_wst', 'nama_shift']);
+            $wstText = $rawWstText;
+            if ($rawWstText === null || $rawWstText === '' || $rawWstText === '-' || (is_numeric($rawWstText) && (float)$rawWstText >= 0 && (float)$rawWstText <= 1)) {
+                if ($break1Start && $break1End) {
+                    $prefix = substr($wstCode, 0, 2);
+                    $wstText = $prefix . ' ' . str_replace(':', '.', $break1Start) . '-' . str_replace(':', '.', $break1End);
+                } elseif ($timeStart && $timeEnd && $timeStart !== '00:00') {
+                    $prefix = substr($wstCode, 0, 2);
+                    $wstText = $prefix . ' ' . str_replace(':', '.', $timeStart) . '-' . str_replace(':', '.', $timeEnd);
+                } else {
+                    $wstText = $wstText ?? '-';
+                }
+            }
+
             Shift::updateOrCreate(
                 ['wst_code' => $wstCode],
                 [
-                    'wst_text' => $get(['wst_text', 'description', 'keterangan', 'keterangan_wst', 'nama_shift']) ?? '-',
+                    'wst_text' => $wstText,
                     'time_start' => $timeStart,
                     'time_end' => $timeEnd,
                     'is_overnight' => $this->determineOvernight(

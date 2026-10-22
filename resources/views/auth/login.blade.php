@@ -207,8 +207,11 @@
                                 <i class="fas fa-lock text-gray-400 text-sm"></i>
                             </div>
                             <input id="password" type="password" name="password" required autocomplete="current-password"
-                                class="modern-input block w-full pl-11 pr-4 py-3.5 rounded-xl text-sm font-semibold text-gray-800 placeholder-gray-400"
+                                class="modern-input block w-full pl-11 pr-11 py-3.5 rounded-xl text-sm font-semibold text-gray-800 placeholder-gray-400"
                                 placeholder="••••••••">
+                            <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-indofood-blue focus:outline-none transition-colors cursor-pointer" title="Lihat/Sembunyikan Kata Sandi">
+                                <i id="togglePasswordIcon" class="fas fa-eye text-sm"></i>
+                            </button>
                         </div>
                         @error('password')
                             <p class="text-red-500 text-[11px] mt-2 font-semibold flex items-center"><i class="fas fa-exclamation-circle mr-1"></i> {{ $message }}</p>
@@ -252,5 +255,22 @@
         </div>
     </div>
 
+    <script>
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('togglePasswordIcon');
+            if (passwordInput && toggleIcon) {
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    toggleIcon.classList.remove('fa-eye');
+                    toggleIcon.classList.add('fa-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    toggleIcon.classList.remove('fa-eye-slash');
+                    toggleIcon.classList.add('fa-eye');
+                }
+            }
+        }
+    </script>
 </body>
 </html>

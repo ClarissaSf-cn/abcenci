@@ -9,10 +9,10 @@
                 </p>
             </div>
 
-            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                <div class="flex items-center bg-white border border-slate-300 rounded-xl p-1 shadow-sm flex-1 sm:flex-none min-w-[140px]">
+            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                <div class="flex items-center bg-white border border-slate-300 rounded-xl p-1 shadow-sm shrink-0 min-w-[130px]">
                     <i class="fas fa-search text-slate-400 ml-2.5 text-xs"></i>
-                    <input type="text" id="employeeSearch" onkeyup="applyEmployeeFilters()" oninput="applyEmployeeFilters()" placeholder="Cari NIK / Nama..." class="text-xs p-1.5 border-none outline-none w-full sm:w-40 font-semibold focus:ring-0">
+                    <input type="text" id="employeeSearch" onkeyup="applyEmployeeFilters()" oninput="applyEmployeeFilters()" placeholder="Cari NIK / Nama..." class="text-xs p-1.5 border-none outline-none w-28 sm:w-36 font-semibold focus:ring-0">
                 </div>
 
                 @php
@@ -24,7 +24,7 @@
                 @endphp
 
                 <!-- Searchable Jabatan Dropdown -->
-                <div class="relative z-40" id="jabatanDropdownContainer">
+                <div class="relative z-40 shrink-0" id="jabatanDropdownContainer">
                     <div class="flex items-center bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 shadow-sm hover:border-blue-400 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
                         <input type="text" 
                                id="filterJabatan" 
@@ -34,7 +34,7 @@
                                onclick="openJabatanDropdown()"
                                oninput="handleJabatanInput(this.value)" 
                                onkeydown="handleJabatanKeydown(event)"
-                               class="text-[11px] p-0 border-none outline-none w-36 md:w-44 font-bold text-slate-700 bg-transparent placeholder-slate-400 focus:ring-0">
+                               class="text-[11px] p-0 border-none outline-none w-28 sm:w-36 font-bold text-slate-700 bg-transparent placeholder-slate-400 focus:ring-0">
                         <button type="button" 
                                 id="btnClearJabatan" 
                                 onclick="clearJabatanFilter(event)" 
@@ -71,7 +71,7 @@
                     </div>
                 </div>
 
-                <select id="sortKaryawan" onchange="applyEmployeeFilters()" class="text-[11px] p-2.5 rounded-xl border border-slate-300 outline-none shadow-sm cursor-pointer font-bold text-slate-700">
+                <select id="sortKaryawan" onchange="applyEmployeeFilters()" class="text-[11px] py-2 px-2.5 rounded-xl border border-slate-300 outline-none shadow-sm cursor-pointer font-bold text-slate-700 shrink-0">
                     <option value="default">Sort Default</option>
                     <option value="az">A - Z</option>
                     <option value="za">Z - A</option>
@@ -79,17 +79,20 @@
                     <option value="oldest">TMK Terlama</option>
                 </select>
 
-                <button onclick="openAddEmployeeModal()" class="bg-blue-600 text-white px-4 py-2.5 rounded-xl text-[10px] font-black uppercase shadow-md hover:bg-blue-700 transition-all flex items-center">
-                    <i class="fas fa-user-plus mr-1.5 text-sm"></i> Tambah
-                </button>
+                {{-- Action Buttons: Tambah & Update Master selalu berdampingan --}}
+                <div class="flex items-center gap-2 shrink-0">
+                    <form action="{{ route('employees.import') }}" method="POST" enctype="multipart/form-data" class="m-0 shrink-0">
+                        @csrf
+                        <label class="bg-green-600 text-white px-3.5 sm:px-4 py-2.5 rounded-xl text-[10px] font-black uppercase shadow-md cursor-pointer hover:bg-green-700 transition-all flex items-center shrink-0 m-0">
+                            <i class="fas fa-file-excel mr-1.5 text-sm"></i> Update Master
+                            <input type="file" name="file_excel" class="hidden" onchange="this.form.submit()">
+                        </label>
+                    </form>
 
-                <form action="{{ route('employees.import') }}" method="POST" enctype="multipart/form-data" class="ml-1">
-                    @csrf
-                    <label class="bg-green-600 text-white px-4 py-2.5 rounded-xl text-[10px] font-black uppercase shadow-md cursor-pointer hover:bg-green-700 transition-all flex items-center">
-                        <i class="fas fa-file-excel mr-1.5 text-sm"></i> Update Master
-                        <input type="file" name="file_excel" class="hidden" onchange="this.form.submit()">
-                    </label>
-                </form>
+                    <button onclick="openAddEmployeeModal()" class="bg-blue-600 text-white px-3.5 sm:px-4 py-2.5 rounded-xl text-[10px] font-black uppercase shadow-md hover:bg-blue-700 transition-all flex items-center shrink-0">
+                        <i class="fas fa-user-plus mr-1.5 text-sm"></i> Tambah
+                    </button>
+                </div>
             </div>
         </div>
 

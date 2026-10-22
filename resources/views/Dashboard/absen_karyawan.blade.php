@@ -33,49 +33,45 @@
         {{-- KARTU PROFIL KARYAWAN ELEGAN & PROFESIONAL --}}
         @if($isKaryawanRole)
             @if($hasBoundNik)
-                <div class="mb-6 p-4 sm:p-5 rounded-2xl shadow-lg relative overflow-hidden" 
-                     style="background: linear-gradient(135deg, #0b192c 0%, #1e3a8a 50%, #0f172a 100%) !important; border: 1px solid #1e3a8a !important; color: #ffffff !important;">
-                    {{-- Soft ambient decoration --}}
-                    <div class="absolute -right-8 -bottom-8 w-44 h-44 rounded-full pointer-events-none" style="background: rgba(59, 130, 246, 0.15); filter: blur(30px);"></div>
-                    <div class="absolute left-1/4 -top-8 w-36 h-36 rounded-full pointer-events-none" style="background: rgba(56, 189, 248, 0.15); filter: blur(30px);"></div>
-
+                <div class="mb-6 p-4 sm:p-5 rounded-2xl shadow-sm relative overflow-hidden bg-indofood-blue text-white border border-blue-900/40" style="background-color: #004a99 !important;">
                     <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div class="flex items-center gap-3.5 sm:gap-4">
-                            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center font-black text-lg sm:text-xl shadow-md shrink-0"
-                                 style="background: linear-gradient(135deg, #2563eb, #38bdf8); color: #ffffff; border: 2px solid rgba(255,255,255,0.2);">
-                                <span>{{ strtoupper(substr($boundEmp->nama, 0, 2)) }}</span>
-                            </div>
+                            @if(!empty($loggedUser->profile_pic))
+                                <img src="{{ asset($loggedUser->profile_pic) }}" alt="Profile" class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl object-cover shadow-xs border border-white/20 shrink-0">
+                            @else
+                                <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center font-black text-lg sm:text-xl shadow-xs shrink-0 bg-white/15 text-white border border-white/20">
+                                    <span>{{ strtoupper(substr($boundEmp->nama, 0, 2)) }}</span>
+                                </div>
+                            @endif
                             <div class="min-w-0">
                                 <div class="flex flex-wrap items-center gap-2 mb-1">
-                                    <h3 class="text-base sm:text-lg font-black tracking-wide truncate uppercase" style="color: #ffffff !important; margin: 0;">{{ $boundEmp->nama }}</h3>
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-black"
-                                          style="background: rgba(59, 130, 246, 0.25); color: #93c5fd; border: 1px solid rgba(147, 197, 253, 0.3);">
-                                        <i class="fas fa-id-badge text-[10px]" style="color: #38bdf8;"></i> NIK: {{ $loggedUser->nik }}
+                                    <h3 class="text-base sm:text-lg font-black tracking-wide truncate uppercase text-white m-0">{{ $boundEmp->nama }}</h3>
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white/15 text-blue-100 border border-white/20">
+                                        <i class="fas fa-id-badge text-[10px] text-blue-200"></i> NIK: {{ $loggedUser->nik }}
                                     </span>
                                 </div>
-                                <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium" style="color: #cbd5e1;">
+                                <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-blue-100">
                                     <span class="flex items-center gap-1.5">
-                                        <i class="fas fa-briefcase text-[11px]" style="color: #38bdf8;"></i>
-                                        <span class="font-bold" style="color: #f8fafc;">{{ $boundEmp->jabatan ?? '-' }}</span>
+                                        <i class="fas fa-briefcase text-[11px] text-blue-200"></i>
+                                        <span class="font-bold text-white">{{ $boundEmp->jabatan ?? '-' }}</span>
                                     </span>
-                                    <span class="hidden sm:inline" style="color: #64748b;">•</span>
+                                    <span class="hidden sm:inline text-blue-300/50">•</span>
                                     <span class="flex items-center gap-1.5">
-                                        <i class="fas fa-users text-[11px]" style="color: #60a5fa;"></i>
-                                        <span>Regu <b style="color: #f8fafc;">{{ $boundEmp->regu ?? '-' }}</b></span>
+                                        <i class="fas fa-users text-[11px] text-blue-200"></i>
+                                        <span>Regu <b class="text-white">{{ $boundEmp->regu ?? '-' }}</b></span>
                                     </span>
-                                    <span class="hidden sm:inline" style="color: #64748b;">•</span>
+                                    <span class="hidden sm:inline text-blue-300/50">•</span>
                                     <span class="flex items-center gap-1.5">
-                                        <i class="fas fa-building text-[11px]" style="color: #818cf8;"></i>
-                                        <span>Unit <b style="color: #f8fafc;">{{ $boundEmp->org_unit_text ?? '-' }}</b></span>
+                                        <i class="fas fa-building text-[11px] text-blue-200"></i>
+                                        <span>Unit <b class="text-white">{{ $boundEmp->org_unit_text ?? '-' }}</b></span>
                                     </span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="flex items-center self-start md:self-auto shrink-0 pt-2 md:pt-0 border-t md:border-0 w-full md:w-auto justify-between md:justify-end" style="border-color: rgba(255,255,255,0.1);">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm"
-                                  style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(52, 211, 153, 0.4); color: #6ee7b7;">
-                                <span class="w-2 h-2 rounded-full animate-pulse" style="background: #34d399;"></span>
+                        <div class="flex items-center self-start md:self-auto shrink-0 pt-2 md:pt-0 border-t md:border-0 w-full md:w-auto justify-between md:justify-end border-white/10">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 shadow-2xs">
+                                <span class="w-2 h-2 rounded-full animate-pulse bg-emerald-400"></span>
                                 <span>Akun Terverifikasi</span>
                             </span>
                         </div>
@@ -149,17 +145,45 @@
 
             {{-- BAGIAN KANAN: Kamera & Tracking GPS --}}
             <div class="lg:col-span-5 flex flex-col gap-5">
-                <div class="flex flex-col items-center bg-slate-50 p-5 rounded-3xl border border-slate-100 h-full shadow-inner justify-center">
-                    <label class="text-[11px] font-black text-slate-500 uppercase mb-4 text-center leading-tight">Area Pemindaian Wajah <br> <span class="text-indofood-blue">(Wajib Terlihat)</span></label>
+                <div class="flex flex-col items-center bg-slate-50 p-4 sm:p-5 rounded-3xl border border-slate-100 h-full shadow-inner justify-center">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-6 h-6 rounded-full bg-blue-100 text-indofood-blue flex items-center justify-center text-xs">
+                            <i class="fas fa-id-card-alt"></i>
+                        </div>
+                        <label class="text-[11px] font-black text-slate-700 uppercase tracking-wider text-center leading-tight">
+                            Pemindaian Biometrik Wajah
+                        </label>
+                    </div>
 
-                    <div class="relative bg-white rounded-2xl border-4 border-slate-200 overflow-hidden shadow-sm flex items-center justify-center w-56 h-56 mx-auto mb-2">
-                        <div id="camera-loading" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 z-0">
-                            <i class="fas fa-camera text-3xl mb-2 animate-pulse text-blue-300"></i>
+                    {{-- Kotak Kamera dengan Oval & Dynamic Border --}}
+                    <div id="camera-box" class="relative bg-slate-900 rounded-3xl border-4 border-slate-300 overflow-hidden shadow-md flex items-center justify-center w-56 h-56 sm:w-60 sm:h-60 mx-auto transition-all duration-300">
+                        <div id="camera-loading" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 z-0 bg-slate-900">
+                            <i class="fas fa-camera text-3xl mb-2 animate-pulse text-blue-400"></i>
                             <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Memuat Kamera...</p>
                         </div>
-                        <video id="camera-stream" autoplay playsinline class="absolute inset-0 w-full h-full object-cover z-10 hidden transform scale-x-[-1]"></video>
+
+                        {{-- Stream Video Kamera --}}
+                        <video id="camera-stream" autoplay playsinline muted class="absolute inset-0 w-full h-full object-cover z-10 hidden transform scale-x-[-1]"></video>
+
+                        {{-- Canvas Overlay untuk Landmark Wajah & Panduan --}}
+                        <canvas id="face-overlay-canvas" class="absolute inset-0 w-full h-full object-cover z-20 pointer-events-none transform scale-x-[-1]"></canvas>
+
+                        {{-- Oval Panduan Wajah (Face Guide) --}}
+                        <div id="face-guide-oval" class="absolute inset-4 rounded-[45%] border-2 border-dashed border-white/40 pointer-events-none z-30 transition-all duration-300 flex items-center justify-center">
+                            {{-- Scanning Beam Line --}}
+                            <div id="face-scan-line" class="absolute w-full h-0.5 bg-cyan-400/80 shadow-[0_0_8px_rgba(34,211,238,0.8)] animate-pulse hidden"></div>
+                        </div>
+
+                        {{-- Canvas Hidden untuk Capture Final --}}
                         <canvas id="camera-canvas" class="hidden"></canvas>
                     </div>
+
+                    {{-- Status Badge Real-Time --}}
+                    <div id="face-status-badge" class="mt-3.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold transition-all duration-300 bg-rose-50 text-rose-600 border border-rose-200 shadow-xs">
+                        <span id="face-status-dot" class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                        <span id="face-status-text">Menunggu Kamera...</span>
+                    </div>
+
                     <input type="hidden" name="foto_absen" id="foto_absen" required>
                 </div>
 
@@ -169,9 +193,9 @@
                         <span>AKUN BELUM MEMILIKI NIK</span>
                     </button>
                 @else
-                    <button type="submit" id="btn-submit-absen" class="w-full flex items-center justify-center gap-2 bg-indofood-blue text-white font-extrabold py-4 rounded-xl uppercase text-sm tracking-widest shadow-lg hover:bg-blue-800 transition-all transform hover:-translate-y-0.5 shrink-0">
-                        <i class="fas fa-shield-alt text-lg"></i>
-                        <span>SIMPAN ABSENSI</span>
+                    <button type="submit" id="btn-submit-absen" class="w-full flex items-center justify-center gap-2 bg-slate-400 text-white font-extrabold py-4 rounded-xl uppercase text-sm tracking-widest shadow-md transition-all shrink-0 opacity-60 cursor-not-allowed">
+                        <i class="fas fa-lock text-lg" id="btn-submit-icon"></i>
+                        <span id="btn-submit-text">KUNCI WAJAH UNTUK ABSEN</span>
                     </button>
                 @endif
             </div>
@@ -195,6 +219,10 @@
     });
 </script>
 @endif
+
+{{-- AI Face Landmark Detection (Google MediaPipe) --}}
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js" crossorigin="anonymous"></script>
 
 <script>
     let lastValidCoordinates = {
@@ -446,6 +474,222 @@
         const btnSubmit = document.getElementById('btn-submit-absen');
         let isSubmitting = false;
 
+        // ==============================================================
+        // AI BIOMETRIC FACE DETECTION (Google MediaPipe)
+        // Mematenkan deteksi wajah utuh: MATA, HIDUNG, dan MULUT
+        // ==============================================================
+        let faceDetector = null;
+        let isFaceLocked = false;
+        let isDetecting = false;
+        let detectionInterval = null;
+
+        function initFaceDetector() {
+            if (typeof FaceDetection === 'undefined') {
+                console.warn('Menunggu library MediaPipe FaceDetection termuat...');
+                setTimeout(initFaceDetector, 400);
+                return;
+            }
+
+            try {
+                faceDetector = new FaceDetection({
+                    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${file}`
+                });
+
+                faceDetector.setOptions({
+                    model: 'short',
+                    minDetectionConfidence: 0.60
+                });
+
+                faceDetector.onResults(onFaceDetectionResults);
+                console.log('AI Biometric Face Detector siap digunakan.');
+            } catch (err) {
+                console.error('Inisialisasi FaceDetector gagal:', err);
+            }
+        }
+
+        async function processDetectionFrame() {
+            if (isDetecting || !faceDetector || !video || video.paused || video.ended || video.videoWidth === 0) return;
+            isDetecting = true;
+            try {
+                await faceDetector.send({ image: video });
+            } catch (err) {
+                // frame dropped
+            } finally {
+                isDetecting = false;
+            }
+        }
+
+        function onFaceDetectionResults(results) {
+            const overlayCanvas = document.getElementById('face-overlay-canvas');
+            if (!overlayCanvas) return;
+            const ctx = overlayCanvas.getContext('2d');
+            overlayCanvas.width = video.videoWidth || 320;
+            overlayCanvas.height = video.videoHeight || 320;
+            ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+
+            const detections = results.detections || [];
+
+            let mataValid = false;
+            let hidungValid = false;
+            let mulutValid = false;
+            let overallValid = false;
+            let statusTitle = 'Mencari Wajah...';
+            let statusDesc = 'Posisikan wajah Anda tepat di depan kamera.';
+            let statusState = 'none'; // 'none', 'partial', 'valid'
+
+            if (detections.length === 0) {
+                statusTitle = 'Wajah Tidak Terlihat';
+                statusDesc = 'Bukan wajah manusia atau kamera tertutup.';
+                statusState = 'none';
+            } else if (detections.length > 1) {
+                statusTitle = 'Terdeteksi >1 Orang';
+                statusDesc = 'Harap lakukan absensi sendiri tanpa orang lain di kamera.';
+                statusState = 'partial';
+            } else {
+                const det = detections[0];
+                const landmarks = det.landmarks || [];
+                const box = det.boundingBox;
+
+                if (landmarks.length >= 4) {
+                    const rightEye = landmarks[0];
+                    const leftEye = landmarks[1];
+                    const noseTip = landmarks[2];
+                    const mouthCenter = landmarks[3];
+
+                    // 1. Validasi Mata: Kedua mata harus berada di atas hidung & terpisah wajar
+                    const eyeDist = Math.hypot(leftEye.x - rightEye.x, leftEye.y - rightEye.y);
+                    const eyeLevel = Math.abs(leftEye.y - rightEye.y);
+                    if (rightEye.y < noseTip.y && leftEye.y < noseTip.y && eyeDist >= 0.06 && (eyeLevel / (eyeDist || 1)) < 0.45) {
+                        mataValid = true;
+                    }
+
+                    // 2. Validasi Hidung: Hidung di bawah mata, di atas mulut, dan di posisi tengah
+                    const minEyeX = Math.min(rightEye.x, leftEye.x);
+                    const maxEyeX = Math.max(rightEye.x, leftEye.x);
+                    if (noseTip.y > Math.max(rightEye.y, leftEye.y) && 
+                        noseTip.y < mouthCenter.y &&
+                        noseTip.x >= minEyeX - 0.08 && noseTip.x <= maxEyeX + 0.08) {
+                        hidungValid = true;
+                    }
+
+                    // 3. Validasi Mulut: Mulut harus di bawah hidung dengan jarak yang jelas
+                    if (mouthCenter.y > noseTip.y && (mouthCenter.y - noseTip.y) >= 0.02) {
+                        mulutValid = true;
+                    }
+
+                    // 4. Validasi Ukuran Wajah: Wajah harus memenuhi porsi frame (tidak terlalu jauh)
+                    const isSizeOk = box && box.width >= 0.20 && box.height >= 0.20;
+
+                    if (mataValid && hidungValid && mulutValid && isSizeOk) {
+                        overallValid = true;
+                        statusTitle = 'Wajah Terverifikasi ✓';
+                        statusDesc = 'Wajah terverifikasi! Tombol absen aktif.';
+                        statusState = 'valid';
+                    } else if (!isSizeOk) {
+                        statusTitle = 'Dekatkan Wajah ke Kamera';
+                        statusDesc = 'Posisikan wajah Anda lebih dekat agar memenuhi area oval.';
+                        statusState = 'partial';
+                    } else {
+                        statusTitle = 'Posisikan Wajah ke Kamera';
+                        statusDesc = 'Pastikan seluruh wajah terlihat jelas dan tidak tertutup.';
+                        statusState = 'partial';
+                    }
+
+                    // Gambarkan titik landmark halus pada canvas overlay
+                    drawLandmarks(ctx, overlayCanvas.width, overlayCanvas.height, landmarks, overallValid);
+                }
+            }
+
+            updateFaceUI(statusState, statusTitle, statusDesc, mataValid, hidungValid, mulutValid, overallValid);
+        }
+
+        function drawLandmarks(ctx, w, h, landmarks, isValid) {
+            const dotColor = isValid ? '#10b981' : '#f59e0b';
+            const glowColor = isValid ? 'rgba(16, 185, 129, 0.45)' : 'rgba(245, 158, 11, 0.45)';
+
+            // Titik 0: Mata Kanan, 1: Mata Kiri, 2: Hidung, 3: Mulut
+            const points = [landmarks[0], landmarks[1], landmarks[2], landmarks[3]];
+
+            points.forEach((pt) => {
+                if (!pt) return;
+                const x = pt.x * w;
+                const y = pt.y * h;
+
+                ctx.beginPath();
+                ctx.arc(x, y, 7, 0, 2 * Math.PI);
+                ctx.fillStyle = glowColor;
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(x, y, 3.5, 0, 2 * Math.PI);
+                ctx.fillStyle = dotColor;
+                ctx.fill();
+            });
+        }
+
+        function updateFaceUI(state, title, desc, mata, hidung, mulut, isValid) {
+            const cameraBox = document.getElementById('camera-box');
+            const guideOval = document.getElementById('face-guide-oval');
+            const scanLine = document.getElementById('face-scan-line');
+            const statusBadge = document.getElementById('face-status-badge');
+            const statusDot = document.getElementById('face-status-dot');
+            const statusText = document.getElementById('face-status-text');
+
+            const btnIcon = document.getElementById('btn-submit-icon');
+            const btnText = document.getElementById('btn-submit-text');
+
+            isFaceLocked = isValid;
+
+            if (statusText) statusText.textContent = title;
+
+            if (state === 'valid') {
+                if (cameraBox) cameraBox.className = 'relative bg-slate-900 rounded-3xl border-4 border-emerald-500 shadow-xl shadow-emerald-500/20 overflow-hidden flex items-center justify-center w-56 h-56 sm:w-60 sm:h-60 mx-auto transition-all duration-300';
+                if (guideOval) guideOval.className = 'absolute inset-4 rounded-[45%] border-2 border-emerald-400 pointer-events-none z-30 transition-all duration-300 flex items-center justify-center';
+                if (scanLine) scanLine.classList.add('hidden');
+
+                if (statusBadge) statusBadge.className = 'mt-3.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold transition-all duration-300 bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-xs';
+                if (statusDot) statusDot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-ping';
+
+                // Buka Kunci Tombol Absen
+                if (btnSubmit && !isSubmitting) {
+                    btnSubmit.classList.remove('opacity-60', 'cursor-not-allowed', 'bg-slate-400');
+                    btnSubmit.classList.add('bg-indofood-blue', 'hover:bg-blue-800', 'hover:-translate-y-0.5', 'cursor-pointer', 'shadow-lg');
+                    if (btnIcon) btnIcon.className = 'fas fa-shield-alt text-lg';
+                    if (btnText) btnText.textContent = 'SIMPAN ABSENSI';
+                }
+            } else if (state === 'partial') {
+                if (cameraBox) cameraBox.className = 'relative bg-slate-900 rounded-3xl border-4 border-amber-400 shadow-lg shadow-amber-500/20 overflow-hidden flex items-center justify-center w-56 h-56 sm:w-60 sm:h-60 mx-auto transition-all duration-300';
+                if (guideOval) guideOval.className = 'absolute inset-4 rounded-[45%] border-2 border-dashed border-amber-400/90 pointer-events-none z-30 transition-all duration-300 flex items-center justify-center';
+                if (scanLine) scanLine.classList.remove('hidden');
+
+                if (statusBadge) statusBadge.className = 'mt-3.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold transition-all duration-300 bg-amber-50 text-amber-700 border border-amber-300 shadow-xs';
+                if (statusDot) statusDot.className = 'w-2 h-2 rounded-full bg-amber-500 animate-pulse';
+
+                // Kunci Tombol Absen secara visual (tetap bisa diklik agar memicu notifikasi peringatan)
+                if (btnSubmit && !isSubmitting) {
+                    btnSubmit.classList.add('opacity-60', 'cursor-not-allowed', 'bg-slate-400');
+                    btnSubmit.classList.remove('bg-indofood-blue', 'hover:bg-blue-800', 'hover:-translate-y-0.5', 'cursor-pointer', 'shadow-lg');
+                    if (btnIcon) btnIcon.className = 'fas fa-lock text-lg';
+                    if (btnText) btnText.textContent = 'KUNCI WAJAH UNTUK ABSEN';
+                }
+            } else {
+                if (cameraBox) cameraBox.className = 'relative bg-slate-900 rounded-3xl border-4 border-rose-500 shadow-lg shadow-rose-500/20 overflow-hidden flex items-center justify-center w-56 h-56 sm:w-60 sm:h-60 mx-auto transition-all duration-300';
+                if (guideOval) guideOval.className = 'absolute inset-4 rounded-[45%] border-2 border-dashed border-rose-400/80 pointer-events-none z-30 transition-all duration-300 flex items-center justify-center';
+                if (scanLine) scanLine.classList.remove('hidden');
+
+                if (statusBadge) statusBadge.className = 'mt-3.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold transition-all duration-300 bg-rose-50 text-rose-600 border border-rose-200 shadow-xs';
+                if (statusDot) statusDot.className = 'w-2 h-2 rounded-full bg-rose-500 animate-pulse';
+
+                // Kunci Tombol Absen secara visual (tetap bisa diklik agar memicu notifikasi peringatan)
+                if (btnSubmit && !isSubmitting) {
+                    btnSubmit.classList.add('opacity-60', 'cursor-not-allowed', 'bg-slate-400');
+                    btnSubmit.classList.remove('bg-indofood-blue', 'hover:bg-blue-800', 'hover:-translate-y-0.5', 'cursor-pointer', 'shadow-lg');
+                    if (btnIcon) btnIcon.className = 'fas fa-lock text-lg';
+                    if (btnText) btnText.textContent = 'KUNCI WAJAH UNTUK ABSEN';
+                }
+            }
+        }
+
         function startCamera() {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 renderCameraError('Browser ini tidak mendukung akses kamera langsung, atau Anda sedang mengakses tanpa HTTPS/localhost.');
@@ -455,8 +699,8 @@
             cameraLoading.classList.remove('hidden');
             cameraLoading.innerHTML = `
                 <div class="flex flex-col items-center justify-center p-3 text-center">
-                    <i class="fas fa-spinner fa-spin text-3xl mb-2 text-blue-500"></i>
-                    <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Menghubungkan Kamera...</p>
+                    <i class="fas fa-spinner fa-spin text-3xl mb-2 text-blue-400"></i>
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Menghubungkan Kamera & AI Biometrik...</p>
                 </div>
             `;
 
@@ -466,6 +710,11 @@
                     video.play().catch(e => console.warn('Play error:', e));
                     video.classList.remove('hidden');
                     cameraLoading.classList.add('hidden');
+
+                    initFaceDetector();
+
+                    if (detectionInterval) clearInterval(detectionInterval);
+                    detectionInterval = setInterval(processDetectionFrame, 120);
                 };
             };
 
@@ -497,7 +746,7 @@
                         <i class="fas fa-video-slash text-base"></i>
                     </div>
                     <p class="text-[11px] font-black uppercase text-red-600 mb-1 leading-tight">KAMERA BELUM AKTIF</p>
-                    <p class="text-[9px] text-slate-500 leading-tight mb-2.5">${reason}</p>
+                    <p class="text-[9px] text-slate-400 leading-tight mb-2.5">${reason}</p>
                     <button type="button" id="btn-retry-camera" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indofood-blue hover:bg-blue-800 text-white text-[10px] font-bold rounded-lg shadow-sm transition">
                         <i class="fas fa-sync-alt text-[9px]"></i> Coba Lagi
                     </button>
@@ -517,6 +766,31 @@
         formAbsen.addEventListener('submit', function(e) {
             e.preventDefault();
             if (isSubmitting) return;
+
+            // ==============================================================
+            // PROTEKSI PATEN: HANYA BOLEH WAJAH (MATA, HIDUNG, MULUT VALID)
+            // ==============================================================
+            if (!isFaceLocked) {
+                Swal.fire({
+                    title: 'WAJAH TIDAK TERLIHAT! ❌',
+                    html: `<div class="text-left text-sm text-slate-700 space-y-2">
+                        <p>Sistem mendeteksi bahwa wajah Anda belum terverifikasi atau tidak terlihat di kamera.</p>
+                        <div class="bg-rose-50 border border-rose-200 p-3.5 rounded-xl text-xs text-rose-900 mt-2">
+                            <p class="font-black uppercase tracking-wider mb-1.5 text-rose-800">Petunjuk Absensi Wajah:</p>
+                            <ul class="space-y-1">
+                                <li class="flex items-center gap-1.5"><i class="fas fa-check-circle text-rose-600"></i> Posisikan wajah Anda tepat di dalam area panduan oval</li>
+                                <li class="flex items-center gap-1.5"><i class="fas fa-check-circle text-rose-600"></i> Pastikan wajah terlihat jelas tanpa tertutup masker atau tangan</li>
+                                <li class="flex items-center gap-1.5"><i class="fas fa-check-circle text-rose-600"></i> Pastikan pencahayaan ruangan cukup terang</li>
+                            </ul>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2 italic">Arahkan kamera ke wajah Anda hingga status berubah hijau "Wajah Terverifikasi".</p>
+                    </div>`,
+                    icon: 'warning',
+                    confirmButtonColor: '#004a99',
+                    confirmButtonText: 'Saya Mengerti'
+                });
+                return;
+            }
 
             const posisiValue = posisiInput.value.trim();
             const namaValue = namaInput.value.trim();
@@ -578,9 +852,18 @@
                 }
 
                 function resetSubmitButton() {
-                    isSubmitting = false; btnSubmit.disabled = false;
-                    btnSubmit.classList.remove('opacity-70', 'cursor-wait'); btnSubmit.classList.add('hover:bg-blue-800', 'hover:-translate-y-0.5');
-                    btnSubmit.innerHTML = '<i class="fas fa-shield-alt text-base"></i><span>SIMPAN ABSENSI</span>';
+                    isSubmitting = false;
+                    if (isFaceLocked) {
+                        btnSubmit.disabled = false;
+                        btnSubmit.classList.remove('opacity-70', 'cursor-wait');
+                        btnSubmit.classList.add('hover:bg-blue-800', 'hover:-translate-y-0.5');
+                        btnSubmit.innerHTML = '<i class="fas fa-shield-alt text-base"></i><span>SIMPAN ABSENSI</span>';
+                    } else {
+                        btnSubmit.disabled = true;
+                        btnSubmit.classList.add('opacity-60', 'cursor-not-allowed', 'bg-slate-400');
+                        btnSubmit.classList.remove('opacity-70', 'cursor-wait', 'hover:bg-blue-800', 'hover:-translate-y-0.5');
+                        btnSubmit.innerHTML = '<i class="fas fa-lock text-base"></i><span>KUNCI WAJAH UNTUK ABSEN</span>';
+                    }
                 }
 
                 if (lastValidCoordinates.lat !== null && lastValidCoordinates.lng !== null) {
