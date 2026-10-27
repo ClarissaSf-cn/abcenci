@@ -21,6 +21,15 @@ class AttendanceController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+
+        // Keamanan: Hanya pengguna yang memiliki Nama, Email, dan NIK yang dapat mengakses dashboard
+        if ($user && $user->role === 'karyawan' && empty(trim((string)$user->nik))) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect()->route('login')->with('error', 'Akses Ditolak! Akun Anda belum memiliki NIK yang terdaftar di Manajemen Pengguna. Silakan hubungi Administrator.');
+        }
+
         $witaNow = Carbon::now('Asia/Makassar');
 
         $lastEntry = Attendance::whereNotNull('catatan')->latest('created_at')->first();

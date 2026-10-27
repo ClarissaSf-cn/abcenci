@@ -53,7 +53,7 @@ class EmployeeImport implements ToModel, WithHeadingRow, SkipsOnError
             'nik'               => $nik,
             'nama'              => $cleanRow['Employee Name'] ?? null,
             'user'              => $cleanRow['User'] ?? $cleanRow['user'] ?? null,
-            'jumlah'            => $cleanRow['Jumlah'] ?? 1,
+            'jumlah'            => $cleanRow['Jumlah'] ?? 1, 
             'jabatan'           => $cleanRow['Position text'] ?? null,
             'employee_group'    => $cleanRow['Employee Group'] ?? null,
             'pers_subarea_text' => $cleanRow['Pers subarea text'] ?? null,

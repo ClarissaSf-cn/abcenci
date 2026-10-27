@@ -1400,14 +1400,22 @@
 
         function openEditProfileModal() {
             const modal = document.getElementById('editProfileModal');
+            if (!modal) return;
             modal.classList.remove('opacity-0', 'pointer-events-none');
-            modal.children[0].classList.remove('scale-95');
+            if (modal.children && modal.children[0]) {
+                modal.children[0].classList.remove('scale-95');
+            }
+            document.body.style.overflow = 'hidden';
         }
 
         function closeEditProfileModal() {
             const modal = document.getElementById('editProfileModal');
+            if (!modal) return;
             modal.classList.add('opacity-0', 'pointer-events-none');
-            modal.children[0].classList.add('scale-95');
+            if (modal.children && modal.children[0]) {
+                modal.children[0].classList.add('scale-95');
+            }
+            document.body.style.overflow = '';
         }
 
         window.previewFotoModal = function(url, nama = '') {

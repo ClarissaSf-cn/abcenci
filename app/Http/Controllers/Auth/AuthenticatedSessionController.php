@@ -29,6 +29,15 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         $user = Auth::user();
+
+        // Keamanan: Karyawan wajib memiliki NIK yang terdaftar
+        if ($user && $user->role === 'karyawan' && empty(trim((string)$user->nik))) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect()->route('login')->with('error', 'Akses Ditolak! Akun Anda belum memiliki NIK yang terdaftar di Manajemen Pengguna. Silakan hubungi Administrator.');
+        }
+
         if ($user && $user->role === 'karyawan') {
             return redirect()->intended(route('dashboard', absolute: false) . '#form-absen');
         }

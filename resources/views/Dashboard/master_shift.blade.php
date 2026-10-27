@@ -175,13 +175,13 @@
 </div>
 
 {{-- MODAL TAMBAH SHIFT --}}
-<div id="modalAddShift" class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+<div id="modalAddShift" class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity" style="z-index: 9999; overflow-y: auto;">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col my-auto" style="max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem);">
+        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center shrink-0" style="flex-shrink: 0;">
             <h3 class="font-black text-slate-700 text-sm uppercase tracking-widest">Tambah Master Shift</h3>
             <button type="button" onclick="document.getElementById('modalAddShift').classList.add('hidden')" class="text-slate-400 hover:text-rose-500"><i class="fas fa-times text-lg"></i></button>
         </div>
-        <form action="{{ route('shifts.store') }}#master-shift" method="POST" class="p-6 space-y-4">
+        <form action="{{ route('shifts.store') }}#master-shift" method="POST" class="p-6 space-y-4 overflow-y-auto flex-1 modal-scrollable-body" style="min-height: 0; flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;">
             @csrf
             <div class="grid grid-cols-2 gap-4">
                 <div>
@@ -232,19 +232,19 @@
                 <label for="is_overnight" class="text-xs font-bold text-slate-600">Shift Lintas Hari (Overnight / H+1)</label>
             </div>
 
-            <button type="submit" class="w-full bg-indofood-blue text-white font-extrabold py-3 rounded-xl uppercase text-xs tracking-widest shadow-md hover:bg-blue-800 transition">SIMPAN MASTER</button>
+            <button type="submit" class="w-full bg-indofood-blue text-white font-extrabold py-3 rounded-xl uppercase text-xs tracking-widest shadow-md hover:bg-blue-800 transition shrink-0" style="flex-shrink: 0;">SIMPAN MASTER</button>
         </form>
     </div>
 </div>
 
 {{-- MODAL EDIT SHIFT --}}
-<div id="modalEditShift" class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+<div id="modalEditShift" class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity" style="z-index: 9999; overflow-y: auto;">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col my-auto" style="max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem);">
+        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center shrink-0" style="flex-shrink: 0;">
             <h3 class="font-black text-slate-700 text-sm uppercase tracking-widest">Edit Master Shift</h3>
             <button type="button" onclick="document.getElementById('modalEditShift').classList.add('hidden')" class="text-slate-400 hover:text-rose-500"><i class="fas fa-times text-lg"></i></button>
         </div>
-        <form id="formEditShift" action="#" method="POST" class="p-6 space-y-4">
+        <form id="formEditShift" action="#" method="POST" class="p-6 space-y-4 overflow-y-auto flex-1 modal-scrollable-body" style="min-height: 0; flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;">
             @csrf
             @method('PUT')
             <div class="grid grid-cols-2 gap-4">

@@ -750,6 +750,103 @@
 
             </div>
 
+            <style>
+                /* =========================================================
+                   STICKY COLUMNS (NO, NIK, NAMA KARYAWAN) - PERSIS DATA KARYAWAN
+                   ========================================================= */
+                .pen-col-sticky-head {
+                    position: sticky !important;
+                    left: 0 !important;
+                    top: 0 !important;
+                    z-index: 50 !important;
+                    width: 340px !important;
+                    min-width: 340px !important;
+                    max-width: 340px !important;
+                    border-right: 2px solid #3b82f6 !important;
+                    box-shadow: 4px 0 10px -2px rgba(15, 23, 42, 0.15) !important;
+                }
+                .pen-col-no {
+                    position: sticky !important;
+                    left: 0 !important;
+                    width: 50px !important;
+                    min-width: 50px !important;
+                    max-width: 50px !important;
+                    z-index: 20 !important;
+                    text-align: center !important;
+                }
+                .pen-col-nik {
+                    position: sticky !important;
+                    left: 50px !important;
+                    width: 105px !important;
+                    min-width: 105px !important;
+                    max-width: 105px !important;
+                    z-index: 20 !important;
+                    text-align: center !important;
+                }
+                .pen-col-nama {
+                    position: sticky !important;
+                    left: 155px !important;
+                    width: 185px !important;
+                    min-width: 185px !important;
+                    max-width: 220px !important;
+                    z-index: 20 !important;
+                    border-right: 2px solid #cbd5e1 !important;
+                    box-shadow: 4px 0 10px -2px rgba(15, 23, 42, 0.08) !important;
+                }
+
+                /* Header Level 2 Sticky th */
+                #tablePenilaian thead tr:nth-child(2) th.pen-col-no,
+                #tablePenilaian thead tr:nth-child(2) th.pen-col-nik,
+                #tablePenilaian thead tr:nth-child(2) th.pen-col-nama {
+                    position: sticky !important;
+                    top: 41px !important;
+                    z-index: 45 !important;
+                    background-color: #f1f5f9 !important;
+                }
+
+                /* Opaque Backgrounds pada tbody agar data saat di-scroll samping tidak tembus pandang */
+                #tablePenilaian tbody tr td.pen-col-no,
+                #tablePenilaian tbody tr td.pen-col-nik,
+                #tablePenilaian tbody tr td.pen-col-nama {
+                    background-color: #ffffff !important;
+                }
+                #tablePenilaian tbody tr:nth-child(even) td.pen-col-no,
+                #tablePenilaian tbody tr:nth-child(even) td.pen-col-nik,
+                #tablePenilaian tbody tr:nth-child(even) td.pen-col-nama {
+                    background-color: #f8fafc !important;
+                }
+                #tablePenilaian tbody tr.bg-amber-50\/40 td.pen-col-no,
+                #tablePenilaian tbody tr.bg-amber-50\/40 td.pen-col-nik,
+                #tablePenilaian tbody tr.bg-amber-50\/40 td.pen-col-nama {
+                    background-color: #fefce8 !important;
+                }
+                #tablePenilaian tbody tr:hover td.pen-col-no,
+                #tablePenilaian tbody tr:hover td.pen-col-nik,
+                #tablePenilaian tbody tr:hover td.pen-col-nama {
+                    background-color: #eff6ff !important;
+                }
+
+                /* Scrollbar halus */
+                .penilaian-scroll-container {
+                    scrollbar-width: thin;
+                    scrollbar-color: #cbd5e1 #f8fafc;
+                    -webkit-overflow-scrolling: touch;
+                }
+                .penilaian-scroll-container::-webkit-scrollbar {
+                    height: 8px;
+                    width: 8px;
+                }
+                .penilaian-scroll-container::-webkit-scrollbar-track {
+                    background: #f8fafc;
+                }
+                .penilaian-scroll-container::-webkit-scrollbar-thumb {
+                    background-color: #cbd5e1;
+                    border-radius: 4px;
+                }
+                .penilaian-scroll-container::-webkit-scrollbar-thumb:hover {
+                    background-color: #94a3b8;
+                }
+            </style>
 
             {{-- =====================================================
                  TABEL PENILAIAN
@@ -757,9 +854,10 @@
 
             <div class="overflow-x-auto
                         max-h-[650px]
-                        overflow-y-auto">
+                        overflow-y-auto
+                        penilaian-scroll-container">
 
-                <table class="text-xs whitespace-nowrap
+                <table id="tablePenilaian" class="text-xs whitespace-nowrap
                               border-collapse w-max">
 
                     <thead>
@@ -771,13 +869,23 @@
                         <tr class="text-white text-center
                                    font-black sticky top-0 z-20">
 
-                            <th colspan="13"
-                                class="border border-slate-700
+                            <th colspan="3"
+                                class="pen-col-sticky-head border border-slate-700
                                        p-3 text-left uppercase"
                                 style="background-color:#1e3a8a !important;
                                        color:#ffffff !important;">
 
                                 Data Karyawan
+
+                            </th>
+
+                            <th colspan="10"
+                                class="border border-slate-700
+                                       p-3 text-left uppercase"
+                                style="background-color:#1e3a8a !important;
+                                       color:#ffffff !important;">
+
+                                Rincian Karyawan
 
                             </th>
 
@@ -853,13 +961,23 @@
                         <tr class="font-black text-center
                                    uppercase sticky top-[41px] z-20">
 
+                            <th class="pen-col-no border border-slate-300 p-2.5"
+                                style="background-color:#f1f5f9 !important; color:#334155 !important;">
+                                No
+                            </th>
+
+                            <th class="pen-col-nik border border-slate-300 p-2.5"
+                                style="background-color:#f1f5f9 !important; color:#334155 !important;">
+                                NIK
+                            </th>
+
+                            <th class="pen-col-nama border border-slate-300 p-2.5"
+                                style="background-color:#f1f5f9 !important; color:#334155 !important;">
+                                Employee Name
+                            </th>
 
                             @foreach([
-
-                                'No',
-                                'NIK',
                                 'Status',
-                                'Employee Name',
                                 'Jumlah',
                                 'Position Text',
                                 'Pers Subarea Text',
@@ -869,7 +987,6 @@
                                 'Marital Status',
                                 'Vendor OS',
                                 'User'
-
                             ] as $header)
 
                                 <th class="border border-slate-300
@@ -1100,19 +1217,29 @@
 
 
                             {{-- =================================================
-                                 DATA KARYAWAN
+                                 DATA KARYAWAN (STICKY NO, NIK, NAMA PERSIS DATA KARYAWAN)
                                  ================================================= --}}
 
-                            <td class="border p-2 text-center font-bold">
+                            {{-- NO (Sticky) --}}
+                            <td class="pen-col-no border p-2 text-center font-bold">
                                 {{ $loop->iteration }}
                             </td>
 
-
-                            <td class="border p-2 text-center font-medium">
-                                {{ $nikValue ?: '-' }}
+                            {{-- NIK (Sticky) --}}
+                            <td class="pen-col-nik border p-2 text-center font-medium">
+                                <span class="inline-block px-2 py-0.5 rounded bg-blue-50/90 text-blue-700 border border-blue-100 font-bold text-xs font-mono tracking-wide">
+                                    {{ $nikValue ?: '-' }}
+                                </span>
                             </td>
 
-                            {{-- STATUS PENILAIAN --}}
+                            {{-- EMPLOYEE NAME (Sticky) --}}
+                            <td class="pen-col-nama border p-2 font-bold text-slate-800 text-left">
+                                <span class="truncate block max-w-[200px]" title="{{ $namaValue }}">
+                                    {{ $namaValue ?: '-' }}
+                                </span>
+                            </td>
+
+                            {{-- STATUS PENILAIAN (Scrollable) --}}
                             <td class="border p-2 text-center status-col">
                                 @if($hasExisting)
                                     @if($isSuperAdmin)
@@ -1129,11 +1256,6 @@
                                         <i class="fas fa-pencil-alt text-slate-400"></i> Belum Dinilai
                                     </span>
                                 @endif
-                            </td>
-
-
-                            <td class="border p-2 font-bold text-slate-800">
-                                {{ $namaValue ?: '-' }}
                             </td>
 
 

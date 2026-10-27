@@ -232,17 +232,17 @@
 </div>
 
 {{-- MODAL PLOT JADWAL BARU --}}
-<div id="modalAddSchedule" class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden transform scale-100 transition-transform">
-        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-            <h3 class="font-black text-slate-700 text-sm uppercase tracking-widest">Plotting Jadwal Shift</h3>
-            <button type="button" onclick="document.getElementById('modalAddSchedule').classList.add('hidden')" class="text-slate-400 hover:text-rose-500 transition"><i class="fas fa-times text-lg"></i></button>
+<div id="modalAddSchedule" class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-900/60 backdrop-blur-sm transition-opacity" style="z-index: 9999; overflow-y: auto;">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden transform scale-100 transition-transform flex flex-col my-auto" style="max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem);">
+        <div class="px-6 py-4.5 border-b border-slate-100 bg-slate-50 flex justify-between items-center shrink-0" style="flex-shrink: 0;">
+            <h3 class="font-bold text-slate-800 text-sm tracking-wide flex items-center gap-2"><i class="fas fa-calendar-plus text-blue-600"></i> Plotting Jadwal Shift</h3>
+            <button type="button" onclick="document.getElementById('modalAddSchedule').classList.add('hidden')" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 transition cursor-pointer"><i class="fas fa-times text-sm"></i></button>
         </div>
 
-        <form id="formAddSchedule" action="{{ route('schedules.store') }}#jadwal-karyawan" method="POST" class="p-6 pb-8 space-y-4">
+        <form id="formAddSchedule" action="{{ route('schedules.store') }}#jadwal-karyawan" method="POST" class="p-5 sm:p-7 space-y-4 sm:space-y-5 overflow-y-auto flex-1 modal-scrollable-body" style="min-height: 0; flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;">
             @csrf
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="text-[10px] font-black text-slate-500 uppercase ml-1 block mb-1">Tanggal & Hari Kerja</label>
                     <div class="flex gap-2">
@@ -320,18 +320,18 @@
 </div>
 
 {{-- MODAL EDIT JADWAL --}}
-<div id="modalEditSchedule" class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden transform scale-100 transition-transform">
-        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-            <h3 class="font-black text-slate-700 text-sm uppercase tracking-widest">Edit Jadwal Shift</h3>
-            <button type="button" onclick="document.getElementById('modalEditSchedule').classList.add('hidden')" class="text-slate-400 hover:text-rose-500 transition"><i class="fas fa-times text-lg"></i></button>
+<div id="modalEditSchedule" class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-900/60 backdrop-blur-sm transition-opacity" style="z-index: 9999; overflow-y: auto;">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden transform scale-100 transition-transform flex flex-col my-auto" style="max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem);">
+        <div class="px-6 py-4.5 border-b border-slate-100 bg-slate-50 flex justify-between items-center shrink-0" style="flex-shrink: 0;">
+            <h3 class="font-bold text-slate-800 text-sm tracking-wide flex items-center gap-2"><i class="fas fa-calendar-check text-blue-600"></i> Edit Jadwal Shift</h3>
+            <button type="button" onclick="document.getElementById('modalEditSchedule').classList.add('hidden')" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 transition cursor-pointer"><i class="fas fa-times text-sm"></i></button>
         </div>
 
-        <form id="formEditSchedule" action="#jadwal-karyawan" method="POST" class="p-6 pb-8 space-y-4">
+        <form id="formEditSchedule" action="#jadwal-karyawan" method="POST" class="p-5 sm:p-7 space-y-4 sm:space-y-5 overflow-y-auto flex-1 modal-scrollable-body" style="min-height: 0; flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;">
             @csrf
             @method('PUT')
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="text-[10px] font-black text-slate-500 uppercase ml-1 block mb-1">Tanggal & Hari Kerja</label>
                     <div class="flex gap-2">

@@ -6,26 +6,37 @@ use App\Models\EmployeeSchedule;
 use App\Models\Shift;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ScheduleImport;
 
 class EmployeeScheduleController extends Controller
 {
-
+    // Menampilkan halaman Jadwal Karyawan
     public function index()
     {
-
+        // ✅ PERBAIKAN 1: Eager loading diperbaiki dari 'shift' menjadi shift1, shift2, shift3, employee
+        // agar relasi yang dipakai di blade ($schedule->shift1, shift2, shift3, employee) tidak null
         $schedules = EmployeeSchedule::with(['shift1', 'shift2', 'shift3', 'employee'])
                         ->orderBy('schedule_date', 'desc')
                         ->get();
 
+        // Mengambil data shift untuk ditampilkan di dropdown form
         $shifts = Shift::orderBy('wst_code', 'asc')->get();
 
+        // ✅ PERBAIKAN 2: Tambah $employees agar blade tidak error saat hitung
+        // registeredCount & unregisteredCount (variabel $employees dibutuhkan blade)
         $employees = \App\Models\Employee::orderBy('nama', 'asc')->get();
 
         return redirect()->to(route('dashboard') . '#jadwal-karyawan');
     }
 
+    // Menyimpan Jadwal Karyawan (STORE)
     public function store(Request $request)
     {
+        // NOTE:
+        // Di form jadwal terdapat input shift: shift_1_id, shift_2_id, shift_3_id.
+        // Table employee_schedules hanya punya 1 kolom shift_id (legacy),
+        // jadi kita tetap simpan ketiganya dan ambil shift pertama yang terisi untuk shift_id.
 
         $request->validate([
             'nik'           => 'required|string|max:20',
@@ -33,6 +44,7 @@ class EmployeeScheduleController extends Controller
             'schedule_type' => 'required|string|max:30',
             'special_note'  => 'nullable|string|max:500',
 
+            
             'shift_1_id' => 'nullable|exists:shifts,id',
             'shift_2_id' => 'nullable|exists:shifts,id',
             'shift_3_id' => 'nullable|exists:shifts,id',
@@ -52,6 +64,7 @@ class EmployeeScheduleController extends Controller
             ])->withInput()->with('active_tab', 'jadwal-karyawan');
         }
 
+        // updateOrCreate agar tidak terjadi duplikasi jadwal di tanggal yang sama
         EmployeeSchedule::updateOrCreate(
             [
                 'nik'           => $request->nik,
@@ -62,16 +75,18 @@ class EmployeeScheduleController extends Controller
                 'shift_1_id'    => $shift1Id,
                 'shift_2_id'    => $shift2Id,
                 'shift_3_id'    => $shift3Id,
-
+                // Legacy: simpan shift_id agar kompatibel dengan data lama
                 'shift_id'      => $shift1Id ?? $shift2Id ?? $shift3Id,
                 'schedule_type' => $request->schedule_type,
                 'special_note'  => $request->special_note,
             ]
         );
 
+        // ✅ PERBAIKAN: redirect()->back() dengan membawa pesan active_tab agar javascript menangkapnya
         return redirect()->back()->with('success', 'Jadwal Karyawan berhasil disimpan!')->with('active_tab', 'jadwal-karyawan');
     }
 
+    // Memperbarui data jadwal (UPDATE)
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -106,24 +121,30 @@ class EmployeeScheduleController extends Controller
             'shift_1_id'    => $shift1Id,
             'shift_2_id'    => $shift2Id,
             'shift_3_id'    => $shift3Id,
-
+            // Legacy (agar relasi lama tidak putus)
             'shift_id'      => $shift1Id ?? $shift2Id ?? $shift3Id,
             'schedule_date' => $request->schedule_date,
             'schedule_type' => $request->schedule_type,
             'special_note'  => $request->special_note,
         ]);
 
+        // ✅ PERBAIKAN: redirect()->back() dengan membawa pesan active_tab agar javascript menangkapnya
         return redirect()->back()->with('success', 'Jadwal Karyawan berhasil diperbarui!')->with('active_tab', 'jadwal-karyawan');
     }
 
+    // Menghapus data jadwal (DELETE)
     public function destroy($id)
     {
         $schedule = EmployeeSchedule::findOrFail($id);
         $schedule->delete();
 
+        // ✅ PERBAIKAN: redirect()->back() dengan membawa pesan active_tab agar javascript menangkapnya
         return redirect('/dashboard#jadwal-karyawan')->with('success', 'Jadwal Karyawan berhasil dihapus!');
     }
 
+    // ==========================================
+    // FUNGSI EXPORT EXCEL JADWAL KARYAWAN
+    // ==========================================
     public function exportExcel()
     {
         $schedules = \App\Models\EmployeeSchedule::with(['employee', 'shift1', 'shift2', 'shift3'])
@@ -187,6 +208,9 @@ class EmployeeScheduleController extends Controller
         exit;
     }
 
+    // ==========================================
+    // FUNGSI EXPORT PDF JADWAL KARYAWAN
+    // ==========================================
     public function exportPdf()
     {
         $schedules  = EmployeeSchedule::with(['shift1', 'shift2', 'shift3', 'employee'])
@@ -284,5 +308,46 @@ class EmployeeScheduleController extends Controller
 
         $pdf = PDF::loadHTML($html)->setPaper('a4', 'landscape');
         return $pdf->download('Data_Jadwal_Karyawan.pdf');
+    }
+
+    // ==========================================
+    // FUNGSI IMPORT JADWAL KARYAWAN (XLS, XLSX, CSV)
+    // ==========================================
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file_excel' => [
+                'required',
+                'file',
+                function ($attribute, $value, $fail) {
+                    $ext = strtolower($value->getClientOriginalExtension());
+                    if (!in_array($ext, ['xlsx', 'xls', 'csv'])) {
+                        $fail('File harus berformat .xlsx, .xls, atau .csv');
+                    }
+                }
+            ]
+        ]);
+
+        try {
+            Excel::import(new ScheduleImport, $request->file('file_excel'));
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Jadwal Karyawan berhasil diimport!'
+                ]);
+            }
+
+            return redirect()->to(route('dashboard') . '#jadwal-karyawan')->with('success', 'Jadwal Karyawan berhasil diimport!');
+        } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Import gagal: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->to(route('dashboard') . '#jadwal-karyawan')->with('error', 'Import gagal: ' . $e->getMessage());
+        }
     }
 }

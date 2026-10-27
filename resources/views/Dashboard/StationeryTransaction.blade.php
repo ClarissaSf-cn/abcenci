@@ -61,13 +61,13 @@
     </div>
 </div>
 
-<div id="modalBarangMasuk" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-sm flex items-center justify-center">
-    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
-        <div class="bg-green-600 px-6 py-4 flex justify-between items-center text-white font-black text-sm uppercase tracking-widest">
+<div id="modalBarangMasuk" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4" style="overflow-y: auto;">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col my-auto" style="max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem);">
+        <div class="bg-green-600 px-6 py-4 flex justify-between items-center text-white font-black text-sm uppercase tracking-widest shrink-0" style="flex-shrink: 0;">
             <span>Input Barang Masuk</span>
             <button type="button" onclick="document.getElementById('modalBarangMasuk').classList.add('hidden')"><i class="fas fa-times"></i></button>
         </div>
-        <form action="{{ route('stationery.transaction.store') }}" method="POST" class="p-6 space-y-4">
+        <form action="{{ route('stationery.transaction.store') }}" method="POST" class="p-6 space-y-4 overflow-y-auto flex-1 modal-scrollable-body" style="min-height: 0; flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;">
             @csrf
             <input type="hidden" name="type" value="masuk">
             <div>
@@ -98,7 +98,7 @@
                 <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">No Dokumen / Nota</label>
                 <input type="text" name="no_dokumen" class="form-input-modern" placeholder="Cth: INV/2026/001">
             </div>
-            <div class="flex gap-3 pt-4">
+            <div class="flex gap-3 pt-4 shrink-0" style="flex-shrink: 0;">
                 <button type="button" onclick="document.getElementById('modalBarangMasuk').classList.add('hidden')" class="flex-1 py-2 rounded-xl bg-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-300">BATAL</button>
                 <button type="submit" class="flex-1 py-2 rounded-xl bg-green-600 text-white text-xs font-bold hover:bg-green-700">SIMPAN MASUK</button>
             </div>
@@ -106,13 +106,13 @@
     </div>
 </div>
 
-<div id="modalBarangKeluar" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-sm flex items-center justify-center">
-    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
-        <div class="bg-orange-500 px-6 py-4 flex justify-between items-center text-white font-black text-sm uppercase tracking-widest">
+<div id="modalBarangKeluar" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4" style="overflow-y: auto;">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col my-auto" style="max-height: calc(100vh - 2.5rem); max-height: calc(100dvh - 2.5rem);">
+        <div class="bg-orange-500 px-6 py-4 flex justify-between items-center text-white font-black text-sm uppercase tracking-widest shrink-0" style="flex-shrink: 0;">
             <span>Input Barang Keluar (Order)</span>
             <button type="button" onclick="document.getElementById('modalBarangKeluar').classList.add('hidden')"><i class="fas fa-times"></i></button>
         </div>
-        <form action="{{ route('stationery.transaction.store') }}" method="POST" class="p-6 space-y-4">
+        <form action="{{ route('stationery.transaction.store') }}" method="POST" class="p-6 space-y-4 overflow-y-auto flex-1 modal-scrollable-body" style="min-height: 0; flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;">
             @csrf
             <input type="hidden" name="type" value="keluar">
             <div>
@@ -148,7 +148,7 @@
                 <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Keterangan / Keperluan</label>
                 <input type="text" name="keterangan" class="form-input-modern" placeholder="Cth: Untuk rapat bulanan">
             </div>
-            <div class="flex gap-3 pt-4">
+            <div class="flex gap-3 pt-4 shrink-0" style="flex-shrink: 0;">
                 <button type="button" onclick="document.getElementById('modalBarangKeluar').classList.add('hidden')" class="flex-1 py-2 rounded-xl bg-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-300">BATAL</button>
                 <button type="submit" class="flex-1 py-2 rounded-xl bg-orange-500 text-white text-xs font-bold hover:bg-orange-600">SIMPAN KELUAR</button>
             </div>

@@ -15,7 +15,11 @@ class UserController extends Controller
             'email'    => 'required|string|max:255|unique:users,email',
             'password' => 'required|string|min:4',
             'role'     => 'required|string',
-            'nik'      => 'nullable|string|max:50',
+            'nik'      => $request->role === 'karyawan' ? 'required|string|max:50|unique:users,nik' : 'nullable|string|max:50|unique:users,nik',
+        ], [
+            'nik.required' => 'NIK wajib diisi untuk pengguna dengan role Karyawan.',
+            'nik.unique'   => 'NIK ini sudah terdaftar pada pengguna lain.',
+            'email.unique' => 'Alamat email ini sudah terdaftar.',
         ]);
 
         User::create([
@@ -38,7 +42,11 @@ class UserController extends Controller
             'email'    => 'required|string|max:255|unique:users,email,' . $id,
             'password' => 'nullable|string|min:4',
             'role'     => 'required|string',
-            'nik'      => 'nullable|string|max:50',
+            'nik'      => $request->role === 'karyawan' ? 'required|string|max:50|unique:users,nik,' . $id : 'nullable|string|max:50|unique:users,nik,' . $id,
+        ], [
+            'nik.required' => 'NIK wajib diisi untuk pengguna dengan role Karyawan.',
+            'nik.unique'   => 'NIK ini sudah terdaftar pada pengguna lain.',
+            'email.unique' => 'Alamat email ini sudah terdaftar.',
         ]);
 
         $updateData = [

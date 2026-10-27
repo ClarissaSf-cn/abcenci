@@ -14,23 +14,24 @@
         /* 1. Base Latar Belakang */
         body, html {
             min-height: 100vh;
-            width: 100vw;
+            width: 100%;
             margin: 0;
             padding: 0;
             font-family: 'Inter', 'Segoe UI', sans-serif;
             background-color: #f4f6f9; /* Abu-abu kertas yang sangat bersih */
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             position: relative;
             z-index: 0;
         }
 
         .full-screen-wrapper {
-            position: absolute;
-            inset: 0;
+            min-height: 100vh;
+            width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
+            padding: 1.5rem 1rem;
         }
 
         /* 2. Nuansa Indofood: Gelembung Warna Korporat (Lebih Pekat) */
@@ -169,9 +170,27 @@
                     <p class="text-sm text-gray-500 font-medium mt-1">Silakan masukkan kredensial akun  Anda.</p>
                 </div>
 
+                @if (session('error'))
+                    <div class="mb-6 p-4 rounded-2xl bg-red-50/95 border border-red-200 text-xs text-red-700 flex items-start gap-3 shadow-md">
+                        <div class="w-8 h-8 rounded-xl bg-red-100 flex items-center justify-center shrink-0 text-red-600 mt-0.5">
+                            <i class="fas fa-shield-alt text-base"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-black text-red-800 uppercase tracking-wider text-[11px] mb-1">Akses Dibatasi</h4>
+                            <p class="font-semibold leading-relaxed text-red-700">{{ session('error') }}</p>
+                        </div>
+                    </div>
+                @endif
+
                 @if (session('status'))
-                    <div class="mb-6 p-4 rounded-xl bg-green-50 border border-green-200 text-sm font-semibold text-green-700 flex items-center">
-                        <i class="fas fa-check-circle mr-3"></i> {{ session('status') }}
+                    <div class="mb-6 p-4 rounded-2xl bg-green-50/95 border border-green-200 text-xs text-green-700 flex items-start gap-3 shadow-md">
+                        <div class="w-8 h-8 rounded-xl bg-green-100 flex items-center justify-center shrink-0 text-green-600 mt-0.5">
+                            <i class="fas fa-check-circle text-base"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-black text-green-800 uppercase tracking-wider text-[11px] mb-1">Pemberitahuan</h4>
+                            <p class="font-semibold leading-relaxed text-green-700">{{ session('status') }}</p>
+                        </div>
                     </div>
                 @endif
 
@@ -255,6 +274,7 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function togglePasswordVisibility() {
             const passwordInput = document.getElementById('password');
@@ -271,6 +291,22 @@
                 }
             }
         }
+
+        @if(session('error'))
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire({
+                icon: 'error',
+                title: 'Akses Ditolak!',
+                html: '<div style="font-size: 13px; line-height: 1.6; color: #475569; padding-top: 4px;">{{ addslashes(session('error')) }}</div>',
+                confirmButtonColor: '#004a99',
+                confirmButtonText: '<i class="fas fa-arrow-left mr-2"></i> Kembali ke Beranda',
+                customClass: {
+                    popup: 'rounded-3xl shadow-2xl p-6 border border-gray-100',
+                    confirmButton: 'rounded-xl px-6 py-2.5 font-bold text-xs uppercase tracking-wider'
+                }
+            });
+        });
+        @endif
     </script>
 </body>
 </html>
