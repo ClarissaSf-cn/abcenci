@@ -10,8 +10,8 @@
         $isSuperAdmin = ($uRole === 'superadmin' || $uName === 'ADMIN SUPER');
         $isAdminPenilaian = ($uRole === 'admin_penilaian' || str_contains($uRole, 'penilaian'));
 
-        $bulanQuery = request('bulan', date('m'));
-        $tahunQuery = request('tahun', date('Y'));
+        $bulanQuery = (string) request('bulan', date('m'));
+        $tahunQuery = (string) request('tahun', date('Y'));
         $bulanNameQuery = \App\Http\Controllers\PenilaianController::normalizeMonthName($bulanQuery);
         $bulanCodeQuery = \App\Http\Controllers\PenilaianController::normalizeMonthCode($bulanQuery);
 
@@ -19,7 +19,7 @@
             $q->where('bulan', $bulanNameQuery)
               ->orWhere('bulan', $bulanQuery)
               ->orWhere('bulan', $bulanCodeQuery);
-        })->where('tahun', $tahunQuery)->orderBy('total_skor', 'desc')->get();
+        })->where('tahun', (string) $tahunQuery)->orderBy('total_skor', 'desc')->get();
     @endphp
 
     <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 flex flex-col gap-6">

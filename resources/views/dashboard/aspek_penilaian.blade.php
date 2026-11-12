@@ -23,11 +23,11 @@
         ];
         $bulanIni = sprintf('%02d', date('m'));
         $bulanIniNama = $namaBulan[$bulanIni] ?? 'Januari';
-        $tahunIni = (int) date('Y');
+        $tahunIni = (string) date('Y');
 
         $initialPenilaians = \App\Models\Penilaian::where(function($q) use ($bulanIniNama, $bulanIni) {
             $q->where('bulan', $bulanIniNama)->orWhere('bulan', $bulanIni);
-        })->where('tahun', $tahunIni)->get()->keyBy('nik');
+        })->where('tahun', (string) $tahunIni)->get()->keyBy('nik');
     @endphp
 
 
