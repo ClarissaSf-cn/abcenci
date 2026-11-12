@@ -2,93 +2,108 @@
     $uniqueGroups = collect($shifts)->pluck('group_ws_type')->filter()->unique();
 @endphp
 
-<div class="glass-card flex-1 overflow-hidden flex flex-col border-t-4 border-indofood-blue shadow-md rounded-2xl">
-    <div class="px-4 sm:px-7 py-3.5 sm:py-5 border-b border-slate-100 bg-white flex flex-wrap justify-between items-center gap-3 sm:gap-4">
+<div class="glass-card rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col flex-1 min-h-0 bg-white">
+    <div class="px-5 sm:px-7 py-3.5 border-b border-slate-100 bg-white flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shrink-0">
         <div>
-            <h3 class="text-sm font-black text-slate-700 uppercase tracking-widest"><i class="fas fa-clock text-indofood-blue mr-2"></i> Master Work Schedule</h3>
-            <p class="text-[10px] font-bold text-slate-400 mt-0.5 sm:mt-1 uppercase tracking-wide">Kelola referensi jam kerja dan istirahat karyawan</p>
+            <div class="flex items-center gap-2.5">
+                <h3 class="text-base sm:text-lg font-bold text-slate-800 leading-tight">Master Work Schedule</h3>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold shadow-sm">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>
+                    <span>{{ isset($shifts) && method_exists($shifts, 'total') ? $shifts->total() : (isset($shifts) ? count($shifts) : 0) }}</span> Shift
+                </span>
+            </div>
+            <p class="text-xs text-slate-400 font-medium mt-0.5">Kelola referensi jam kerja dan istirahat karyawan</p>
         </div>
 
         {{-- KUMPULAN TOMBOL AKSI --}}
-        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-            <a href="{{ route('shifts.export-pdf') }}" target="_blank" class="bg-red-500 text-white px-3 sm:px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-red-600 transition shadow flex items-center">
-                <i class="fas fa-file-pdf mr-1.5 sm:mr-2 text-sm"></i> PDF
+        <div class="flex items-center gap-2.5 flex-wrap sm:flex-nowrap shrink-0">
+            <a href="{{ route('shifts.export-pdf') }}" target="_blank" class="px-3.5 rounded-xl text-white text-xs font-bold transition-all shadow-sm hover:opacity-90 active:scale-[0.98] flex items-center gap-1.5 cursor-pointer" style="background-color: #ef4444 !important; height: 38px;">
+                <i class="fas fa-file-pdf text-sm"></i>
+                <span>PDF</span>
             </a>
-            <a href="{{ route('shifts.export-excel') }}" class="bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-emerald-700 transition shadow flex items-center">
-                <i class="fas fa-file-excel mr-1.5 sm:mr-2 text-sm"></i> EXCEL
+            <a href="{{ route('shifts.export-excel') }}" class="px-3.5 rounded-xl text-white text-xs font-bold transition-all shadow-sm hover:opacity-90 active:scale-[0.98] flex items-center gap-1.5 cursor-pointer" style="background-color: #16a34a !important; height: 38px;">
+                <i class="fas fa-file-excel text-sm"></i>
+                <span>Excel</span>
             </a>
 
-            <form id="formImportShift" action="{{ route('shifts.import') }}" method="POST" enctype="multipart/form-data" class="m-0">
+            <form id="formImportShift" action="{{ route('shifts.import') }}" method="POST" enctype="multipart/form-data" class="m-0 shrink-0">
                 @csrf
-                <label for="inputImportFile" class="bg-indofood-blue text-white px-3 sm:px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-blue-800 transition shadow flex items-center cursor-pointer">
-                    <i class="fas fa-file-excel mr-1.5 sm:mr-2 text-sm"></i> Import Shift
+                <label for="inputImportFile" class="px-4 rounded-xl text-white text-xs font-bold transition-all shadow-sm hover:opacity-90 active:scale-[0.98] flex items-center gap-2 cursor-pointer m-0 shrink-0" style="background-color: #004a99 !important; height: 38px;">
+                    <i class="fas fa-file-import text-sm"></i>
+                    <span>Import Shift</span>
+                    <input id="inputImportFile" type="file" name="file_excel" accept=".xlsx,.xls,.csv" class="hidden" onchange="uploadImportShift(this)">
                 </label>
-                <input id="inputImportFile" type="file" name="file_excel" accept=".xlsx,.xls,.csv" class="hidden" onchange="uploadImportShift(this)">
             </form>
 
-            <button onclick="document.getElementById('modalAddShift').classList.remove('hidden')" class="bg-indofood-blue text-white px-3 sm:px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-blue-800 transition shadow flex items-center">
-                <i class="fas fa-plus-circle mr-1.5 sm:mr-2 text-sm"></i> Tambah Shift
+            <button onclick="document.getElementById('modalAddShift').classList.remove('hidden')" class="px-4 rounded-xl text-white text-xs font-bold transition-all shadow-sm hover:opacity-95 active:scale-[0.98] flex items-center gap-2 cursor-pointer shrink-0" style="background-color: #004a99 !important; height: 38px;">
+                <i class="fas fa-plus-circle text-sm"></i>
+                <span>Tambah Shift</span>
             </button>
         </div>
     </div>
 
     {{-- AREA FILTER PENCARIAN SPESIFIK & TOMBOL AKSI MASSAL --}}
-    <div class="px-4 sm:px-7 py-3 bg-slate-50 border-b border-slate-100 flex flex-wrap justify-between items-center gap-3 shrink-0">
-        <div class="flex items-center gap-2 h-9">
-            <button onclick="prosesDataTerpilih()" id="btnBulkAction" class="hidden bg-slate-700 text-white px-4 py-2 rounded-lg text-[9px] font-bold uppercase tracking-widest hover:bg-slate-800 transition shadow-sm flex items-center">
-                <i class="fas fa-tasks mr-2"></i> Proses Terpilih (<span id="countSelected">0</span>)
+    <div class="px-5 sm:px-7 py-2.5 bg-slate-50 border-b border-slate-200/80 flex flex-wrap items-center justify-between gap-2.5 shrink-0">
+        <div class="flex items-center gap-2">
+            <button onclick="prosesDataTerpilih()" id="btnBulkAction" class="hidden bg-slate-700 text-white px-3.5 rounded-xl text-xs font-bold hover:bg-slate-800 transition shadow-sm items-center gap-1.5" style="height: 38px;">
+                <i class="fas fa-tasks text-xs"></i> <span>Proses Terpilih (<span id="countSelected">0</span>)</span>
             </button>
 
-            <button onclick="bulkDeleteShifts()" id="btnBulkDelete" class="hidden bg-red-500 text-white px-4 py-2 rounded-lg text-[9px] font-bold uppercase tracking-widest hover:bg-red-600 transition shadow-sm flex items-center">
-                <i class="fas fa-trash-alt mr-2"></i> Hapus Terpilih
+            <button onclick="bulkDeleteShifts()" id="btnBulkDelete" class="hidden bg-rose-500 text-white px-3.5 rounded-xl text-xs font-bold hover:bg-rose-600 transition shadow-sm items-center gap-1.5" style="height: 38px;">
+                <i class="fas fa-trash-alt text-xs"></i> <span>Hapus Terpilih</span>
             </button>
         </div>
 
-        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-            <select id="filterOvernight" onchange="filterShifts()" class="text-[11px] font-semibold text-slate-600 border border-slate-200 rounded-xl px-3 py-2 bg-white focus:border-indofood-blue focus:ring-1 focus:ring-indofood-blue outline-none shadow-sm cursor-pointer">
-                <option value="">Semua Lintas Hari</option>
-                <option value="Ya">Lintas Hari: Ya (H+1)</option>
-                <option value="Tidak">Lintas Hari: Tidak</option>
-            </select>
+        <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+            <div class="relative flex items-center shrink-0">
+                <select id="filterOvernight" onchange="filterShifts()" class="text-xs font-semibold text-slate-700 border border-slate-300 rounded-xl pl-3.5 pr-8 bg-white focus:outline-none focus:border-blue-500 shadow-sm cursor-pointer appearance-none transition-all" style="height: 38px;">
+                    <option value="">Semua Lintas Hari</option>
+                    <option value="Ya">Lintas Hari: Ya (H+1)</option>
+                    <option value="Tidak">Lintas Hari: Tidak</option>
+                </select>
+                <i class="fas fa-chevron-down text-slate-400 text-[9px] absolute right-3 pointer-events-none"></i>
+            </div>
 
-            <select id="filterGroup" onchange="filterShifts()" class="text-[11px] font-semibold text-slate-600 border border-slate-200 rounded-xl px-3 py-2 bg-white focus:border-indofood-blue focus:ring-1 focus:ring-indofood-blue outline-none shadow-sm cursor-pointer">
-                <option value="">Semua Grup WS</option>
-                @foreach($uniqueGroups as $group)
-                    <option value="{{ $group }}">{{ $group }}</option>
-                @endforeach
-            </select>
+            <div class="relative flex items-center shrink-0">
+                <select id="filterGroup" onchange="filterShifts()" class="text-xs font-semibold text-slate-700 border border-slate-300 rounded-xl pl-3.5 pr-8 bg-white focus:outline-none focus:border-blue-500 shadow-sm cursor-pointer appearance-none transition-all" style="height: 38px;">
+                    <option value="">Semua Grup WS</option>
+                    @foreach($uniqueGroups as $group)
+                        <option value="{{ $group }}">{{ $group }}</option>
+                    @endforeach
+                </select>
+                <i class="fas fa-chevron-down text-slate-400 text-[9px] absolute right-3 pointer-events-none"></i>
+            </div>
 
-            <div class="relative w-64">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+            <div class="relative flex items-center w-64 sm:w-72">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
                     <i class="fas fa-search text-xs"></i>
                 </span>
-                <input type="text" id="searchShift" onkeyup="filterShifts()" placeholder="Cari Kode / Keterangan WST..." class="w-full pl-9 pr-4 py-2 text-[11px] font-semibold text-slate-700 border border-slate-200 rounded-xl focus:border-indofood-blue focus:ring-1 focus:ring-indofood-blue outline-none transition-shadow shadow-sm bg-white placeholder-slate-400">
+                <input type="text" id="searchShift" onkeyup="filterShifts()" placeholder="Cari Kode / Keterangan WS..." class="w-full pl-9 pr-3.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 shadow-sm transition-all" style="height: 38px;">
             </div>
         </div>
     </div>
 
     <div class="overflow-y-auto p-5 bg-slate-50 flex-1">
-        <table class="w-full text-left border-collapse table-bordered whitespace-nowrap bg-white shadow-sm rounded-xl overflow-hidden" id="shiftTable">
-
-            <thead class="bg-slate-100 text-slate-600 text-[9px] uppercase tracking-wider font-black border-b-2 border-slate-200 sticky top-0 z-10">
+        <table class="w-full text-left border-collapse whitespace-nowrap bg-white shadow-sm rounded-xl overflow-hidden" id="shiftTable">
+            <thead class="sticky top-0 z-10 shadow-xs">
                 <tr>
-                    <th class="p-3 text-center w-10">
+                    <th class="p-3.5 text-center w-10">
                         <input type="checkbox" id="checkAllShifts" onclick="toggleAllShifts(this)" class="w-3.5 h-3.5 text-indofood-blue rounded border-slate-300 focus:ring-indofood-blue cursor-pointer">
                     </th>
-                            <th class="p-3 text-center">No</th>
-                    <th class="p-3 text-center">Kode Jam Kerja</th>
-                    <th class="p-3">Keterangan</th>
-                    <th class="p-3 text-center">Awal Jam Kerja</th>
-                    <th class="p-3 text-center">Akhir Jam Kerja</th>
-                    <th class="p-3 text-center">Kode Istirahat</th>
-                    <th class="p-3 text-center">Mulai Istiraha</th>
-                    <th class="p-3 text-center">Akhir Istirahat</th>
-                    <th class="p-3 text-center">Total Istirahat</th>
-                    <th class="p-3 text-center">Total Jam Kerja</th>
-                    <th class="p-3 text-center">Aksi</th>
+                    <th class="p-3.5 text-center">No</th>
+                    <th class="p-3.5 text-center">Kode Jam Kerja</th>
+                    <th class="p-3.5">Keterangan</th>
+                    <th class="p-3.5 text-center">Awal Jam Kerja</th>
+                    <th class="p-3.5 text-center">Akhir Jam Kerja</th>
+                    <th class="p-3.5 text-center">Kode Istirahat</th>
+                    <th class="p-3.5 text-center">Mulai Istirahat</th>
+                    <th class="p-3.5 text-center">Akhir Istirahat</th>
+                    <th class="p-3.5 text-center">Total Istirahat</th>
+                    <th class="p-3.5 text-center">Total Jam Kerja</th>
+                    <th class="p-3.5 text-center">Aksi</th>
                 </tr>
             </thead>
-            <tbody class="text-[11px]">
+            <tbody class="divide-y divide-slate-100 text-slate-700 bg-white">
                 @php
                     $page = method_exists($shifts, 'currentPage') ? $shifts->currentPage() : 1;
                     $perPage = method_exists($shifts, 'perPage') ? $shifts->perPage() : 15;
@@ -96,46 +111,64 @@
                 @endphp
 
                 @forelse($shifts as $index => $shift)
-                <tr class="text-slate-700 hover:bg-blue-50/50 transition border-b border-slate-100 shift-row"
+                <tr class="hover:bg-blue-50/50 transition-colors border-b border-slate-100 shift-row"
                     data-search="{{ strtolower($shift->wst_code . ' ' . $shift->wst_text) }}"
                     data-overnight="{{ $shift->is_overnight ? 'Ya' : 'Tidak' }}"
                     data-group="{{ $shift->group_ws_type }}">
 
-                    <td class="p-3 text-center">
+                    <td class="p-3.5 text-center">
                         <input type="checkbox" class="shift-checkbox w-3.5 h-3.5 text-indofood-blue rounded border-slate-300 focus:ring-indofood-blue cursor-pointer" value="{{ $shift->id }}" onchange="updateBulkActionBtn()">
                     </td>
 
-<td class="p-3 text-center shift-no">{{ $offset + $index + 1 }}</td>
-                    <td class="p-3 text-center"><span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg border border-blue-200">{{ $shift->wst_code }}</span></td>
-                    <td class="p-3">{{ $shift->wst_text }}</td>
-                    <td class="p-3 text-center text-emerald-600">{{ \Carbon\Carbon::parse($shift->time_start)->format('H:i') }}</td>
-                    <td class="p-3 text-center text-rose-600">{{ \Carbon\Carbon::parse($shift->time_end)->format('H:i') }}</td>
-                    <td class="p-3 text-center">{{ $shift->group_ws_type ?? '-' }}</td>
-                    <td class="p-3 text-center text-slate-500">{{ $shift->break1_start ? \Carbon\Carbon::parse($shift->break1_start)->format('H:i') : '-' }}</td>
-                    <td class="p-3 text-center text-slate-500">{{ $shift->break1_end ? \Carbon\Carbon::parse($shift->break1_end)->format('H:i') : '-' }}</td>
-                    <td class="p-3 text-center text-slate-700">{{ ($shift->break1_duration ?? 0) + ($shift->break2_duration ?? 0) }} menit</td>
-                    <td class="p-3 text-center text-slate-700">
+                    <td class="p-3.5 text-center">
+                        <span class="text-xs font-semibold text-slate-400 shift-no">{{ $offset + $index + 1 }}</span>
+                    </td>
+                    <td class="p-3.5 text-center">
+                        <span class="inline-block px-2.5 py-1 rounded-lg bg-blue-50/90 text-blue-700 border border-blue-100 font-bold text-xs font-mono tracking-wide">{{ $shift->wst_code }}</span>
+                    </td>
+                    <td class="p-3.5">
+                        <span class="text-xs font-medium text-slate-800">{{ $shift->wst_text }}</span>
+                    </td>
+                    <td class="p-3.5 text-center">
+                        <span class="text-xs font-semibold text-emerald-600 font-mono">{{ \Carbon\Carbon::parse($shift->time_start)->format('H:i') }}</span>
+                    </td>
+                    <td class="p-3.5 text-center">
+                        <span class="text-xs font-semibold text-rose-600 font-mono">{{ \Carbon\Carbon::parse($shift->time_end)->format('H:i') }}</span>
+                    </td>
+                    <td class="p-3.5 text-center">
+                        <span class="text-xs font-medium text-slate-700">{{ $shift->group_ws_type ?? '-' }}</span>
+                    </td>
+                    <td class="p-3.5 text-center">
+                        <span class="text-xs font-medium text-slate-500 font-mono">{{ $shift->break1_start ? \Carbon\Carbon::parse($shift->break1_start)->format('H:i') : '-' }}</span>
+                    </td>
+                    <td class="p-3.5 text-center">
+                        <span class="text-xs font-medium text-slate-500 font-mono">{{ $shift->break1_end ? \Carbon\Carbon::parse($shift->break1_end)->format('H:i') : '-' }}</span>
+                    </td>
+                    <td class="p-3.5 text-center">
+                        <span class="text-xs font-medium text-slate-700">{{ ($shift->break1_duration ?? 0) + ($shift->break2_duration ?? 0) }} menit</span>
+                    </td>
+                    <td class="p-3.5 text-center">
                         @php
                             $start = \Carbon\Carbon::parse($shift->time_start);
                             $end = \Carbon\Carbon::parse($shift->time_end);
                             if ($end->lt($start)) { $end->addDay(); }
                             $totalMinutes = $start->diffInMinutes($end) - (($shift->break1_duration ?? 0) + ($shift->break2_duration ?? 0));
                         @endphp
-                        {{ intdiv($totalMinutes, 60) }} jam {{ $totalMinutes % 60 }} mnt
+                        <span class="text-xs font-semibold text-slate-700">{{ intdiv($totalMinutes, 60) }} jam {{ $totalMinutes % 60 }} mnt</span>
                     </td>
 
                     {{-- TOMBOL AKSI CRUD --}}
-                    <td class="p-3 text-center">
-                        <div class="flex justify-center gap-3">
-                            <button type="button" data-shift="{{ base64_encode(json_encode($shift)) }}" onclick="openEditShiftModal(this)" class="text-blue-500 hover:scale-110 transition-transform" title="Edit Shift">
-                                <i class="fas fa-edit"></i>
+                    <td class="p-3.5 text-center">
+                        <div class="flex justify-center items-center gap-2.5">
+                            <button type="button" data-shift="{{ base64_encode(json_encode($shift)) }}" onclick="openEditShiftModal(this)" class="w-8 h-8 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors flex items-center justify-center cursor-pointer" title="Edit Shift">
+                                <i class="fas fa-edit text-xs"></i>
                             </button>
 
                             <form action="{{ route('shifts.destroy', $shift->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus master shift ini?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-red-400 hover:text-red-600 transition-transform hover:scale-110" title="Hapus Shift">
-                                    <i class="fas fa-trash-alt"></i>
+                                <button type="submit" class="w-8 h-8 rounded-lg text-rose-500 hover:bg-rose-50 transition-colors flex items-center justify-center cursor-pointer" title="Hapus Shift">
+                                    <i class="fas fa-trash-alt text-xs"></i>
                                 </button>
                             </form>
                         </div>
@@ -542,3 +575,42 @@ Swal.fire('Gagal', e.message || 'Terjadi kesalahan saat menghapus shift.', 'erro
         });
     }
 </script>
+
+<style>
+    /* Styling Tabel Master Shift Modern & Presisi (Harmonis dengan Data Karyawan) */
+    #shiftTable {
+        border-collapse: separate !important;
+        border-spacing: 0 !important;
+    }
+    #shiftTable thead th {
+        background-color: #f8fafc !important;
+        color: #475569 !important;
+        font-weight: 700 !important;
+        font-size: 11px !important;
+        letter-spacing: 0.04em !important;
+        text-transform: uppercase !important;
+        border-top: none !important;
+        border-bottom: 1.5px solid #e2e8f0 !important;
+        border-right: 1px solid #f1f5f9 !important;
+        border-left: none !important;
+        padding: 0.85rem 1rem !important;
+        white-space: nowrap !important;
+    }
+    #shiftTable tbody td {
+        border-bottom: 1px solid #f1f5f9 !important;
+        border-right: 1px solid #f1f5f9 !important;
+        border-top: none !important;
+        border-left: none !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 12px !important;
+        color: #334155 !important;
+        vertical-align: middle !important;
+        background-color: #ffffff;
+    }
+    #shiftTable tbody tr:nth-child(even) td {
+        background-color: #fafbfc;
+    }
+    #shiftTable tbody tr:hover td {
+        background-color: #f0f7ff !important;
+    }
+</style>

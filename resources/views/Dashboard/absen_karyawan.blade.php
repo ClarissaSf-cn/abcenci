@@ -141,6 +141,42 @@
                     <label class="text-[11px] font-black text-slate-500 uppercase ml-1 block mb-1.5">Keterangan (Opsional)</label>
                     <input type="text" name="keterangan" placeholder="Contoh: Terlambat karena macet..." class="form-input-modern w-full text-slate-900 border border-slate-200 bg-slate-50 focus:bg-white focus:ring-indofood-blue rounded-xl shadow-sm py-3 px-4 text-sm transition-all">
                 </div>
+
+                {{-- PANEL INFORMASI LOKASI PENGGUNA & STATUS RADIUS --}}
+                <div class="bg-slate-50/90 rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-xs">
+                    <div class="flex items-center justify-between mb-3 border-b border-slate-200/80 pb-2.5">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-xs">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800 leading-tight">Verifikasi Lokasi & Geofencing GPS</h4>
+                                <p class="text-[10px] text-slate-400">Pengecekan koordinat dan kepatuhan area poligon OSS</p>
+                            </div>
+                        </div>
+                        <button type="button" id="btn-refresh-gps" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-blue-600 hover:bg-blue-50 text-[11px] font-bold shadow-2xs transition-all cursor-pointer" title="Perbarui Lokasi GPS">
+                            <i class="fas fa-sync-alt text-[10px]" id="refresh-gps-icon"></i>
+                            <span>Segarkan GPS</span>
+                        </button>
+                    </div>
+
+                    {{-- Live Info GPS Pengguna --}}
+                    <div id="live-gps-text" class="mb-3 p-3 bg-white rounded-xl border border-slate-200/80 text-xs text-slate-700 shadow-2xs">
+                        <div class="flex items-center gap-2 text-slate-500 font-medium">
+                            <i class="fas fa-satellite-dish text-blue-500 animate-spin"></i>
+                            <span>Sedang mendeteksi sinyal GPS lokasi Anda...</span>
+                        </div>
+                    </div>
+
+                    {{-- Mini Map Visual Leaflet --}}
+                    <div class="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-2xs" style="height: 170px;">
+                        <div id="user-gps-minimap" class="w-full h-full z-10"></div>
+                        <div class="absolute bottom-2 left-2 z-20 bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded-lg border border-slate-200 text-[10px] font-bold text-slate-700 shadow-2xs flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                            <span id="minimap-zone-label">Peta Zona Geofence OSS</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {{-- BAGIAN KANAN: Kamera & Tracking GPS --}}
@@ -233,71 +269,56 @@
         zoneInfo: null
     };
 
-    const ZONES = [
-        {
-            name: "Area Gas",
-            center_lat: -3.549192,
-            center_lng: 114.730445,
-            polygon: [
-                [-3.549134, 114.730352],
-                [-3.549073, 114.730467],
-                [-3.549254, 114.730538],
-                [-3.549311, 114.730453]
-            ],
-            bounds: {
-                north: -3.549073, south: -3.549311, east: 114.730538, west: 114.730352
-            },
-            allowed_positions: []
-        },
-        {
-            name: "Ruangan Produksi",
-            center_lat: -3.549233,
-            center_lng: 114.730057,
-            polygon: [
-                [-3.549122, 114.730147],
-                [-3.549250, 114.730196],
-                [-3.549368, 114.730001],
-                [-3.549192, 114.729886]
-            ],
-            bounds: {
-                north: -3.549122, south: -3.549368, east: 114.730196, west: 114.729886
-            },
-            allowed_positions: []
-        },
-        {
-            name: "Pos Security",
-            center_lat: -3.550000,
-            center_lng: 114.731213,
-            polygon: [
-                [-3.549905, 114.731293],
-                [-3.549991, 114.731098],
-                [-3.550117, 114.731111],
-                [-3.549987, 114.731349]
-            ],
-            bounds: {
-                north: -3.549905, south: -3.550117, east: 114.731349, west: 114.731098
-            },
-            allowed_positions: []
-        },
-        {
-            name: "Area Warehouse",
-            center_lat: -3.550112,
-            center_lng: 114.730494,
-            polygon: [
-                [-3.549961, 114.730549],
-                [-3.550069, 114.730343],
-                [-3.550265, 114.730430],
-                [-3.550152, 114.730652]
-            ],
-            bounds: {
-                north: -3.549961, south: -3.550265, east: 114.730652, west: 114.730343
-            },
-            allowed_positions: []
+    // Ambil Data Lokasi Presensi Dinamis dari Pengaturan Super Admin
+    @php
+        $activeLocs = \App\Models\AttendanceLocation::where('is_active', true)->get();
+        if ($activeLocs->isEmpty()) {
+            $activeLocs = \App\Models\AttendanceLocation::all();
         }
-    ];
+    @endphp
+    const DB_LOCATIONS = @json($activeLocs);
 
-    const MAX_RADIUS_METERS = 100;
+    let ZONES = [];
+    if (DB_LOCATIONS && DB_LOCATIONS.length > 0) {
+        let activeList = DB_LOCATIONS.filter(l => l.is_active == 1 || l.is_active === true);
+        if (activeList.length === 0) activeList = DB_LOCATIONS;
+        ZONES = activeList.map(l => {
+            let poly = l.polygon;
+            if (typeof poly === 'string') {
+                try { poly = JSON.parse(poly); } catch(e) {}
+            }
+            return {
+                name: l.nama_lokasi,
+                center_lat: parseFloat(l.latitude),
+                center_lng: parseFloat(l.longitude),
+                radius_meter: parseInt(l.radius_meter) || 100,
+                polygon: Array.isArray(poly) && poly.length >= 3 ? poly : null,
+                alamat: l.alamat || '',
+                allowed_positions: []
+            };
+        });
+    }
+
+    // Fallback jika belum ada lokasi di database
+    if (ZONES.length === 0) {
+        ZONES = [
+            {
+                name: "Pabrik PT Indofood CBP Sukses Makmur Tbk",
+                center_lat: -3.54895,
+                center_lng: 114.72981,
+                radius_meter: 100,
+                polygon: null,
+                alamat: "Banjarbaru, Kalimantan Selatan",
+                allowed_positions: []
+            }
+        ];
+    }
+
     let currentWatchId = null;
+    let userMinimap = null;
+    let userMinimapMarker = null;
+    let userMinimapPolygon = null;
+    let userMinimapLine = null;
 
     function getDistance(lat1, lon1, lat2, lon2) {
         const R = 6371e3;
@@ -310,56 +331,66 @@
         return R * c;
     }
 
-    function isWithinZoneBounds(userLat, userLng, zone) {
-        if (zone.polygon) {
-            let x = userLat, y = userLng;
-            let inside = false;
-            for (let i = 0, j = zone.polygon.length - 1; i < zone.polygon.length; j = i++) {
-                let xi = zone.polygon[i][0], yi = zone.polygon[i][1];
-                let xj = zone.polygon[j][0], yj = zone.polygon[j][1];
-                let intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-                if (intersect) inside = !inside;
-            }
-            return inside;
+    function isPointInPolygonJS(lat, lng, polygon) {
+        if (!polygon || !Array.isArray(polygon) || polygon.length < 3) return false;
+        let inside = false;
+        const numPoints = polygon.length;
+        for (let i = 0, j = numPoints - 1; i < numPoints; j = i++) {
+            const xi = parseFloat(polygon[i][0]);
+            const yi = parseFloat(polygon[i][1]);
+            const xj = parseFloat(polygon[j][0]);
+            const yj = parseFloat(polygon[j][1]);
+
+            const intersect = ((yi > lng) !== (yj > lng)) &&
+                (lat < (xj - xi) * (lng - yi) / (yj - yi) + xi);
+            if (intersect) inside = !inside;
         }
-        const lat_ok = userLat >= zone.bounds.south && userLat <= zone.bounds.north;
-        const lng_ok = userLng >= zone.bounds.west && userLng <= zone.bounds.east;
-        return lat_ok && lng_ok;
+        return inside;
     }
 
     function isWithinZoneRadius(userLat, userLng, zone) {
         const distFromCenter = getDistance(userLat, userLng, zone.center_lat, zone.center_lng);
-        return distFromCenter <= MAX_RADIUS_METERS;
+        const maxRadius = zone.radius_meter || 100;
+        return distFromCenter <= maxRadius;
     }
 
     function getClosestZoneWithDetails(userLat, userLng) {
         let closestZone = null;
         let distFromClosest = Infinity;
-        let isInBounds = false;
-        let isInRadius = false;
+        let isInsidePolygon = false;
+        let isValid = false;
 
         for (const zone of ZONES) {
-            const inBounds = isWithinZoneBounds(userLat, userLng, zone);
-            const inRadius = isWithinZoneRadius(userLat, userLng, zone);
+            const hasPoly = zone.polygon && Array.isArray(zone.polygon) && zone.polygon.length >= 3;
+            const inPoly = hasPoly ? isPointInPolygonJS(userLat, userLng, zone.polygon) : false;
+            // Jika ada poligon OSS, patokan mutlak adalah area poligon. Fallback radius hanya jika tidak ada poligon sama sekali.
+            const inRadius = !hasPoly ? isWithinZoneRadius(userLat, userLng, zone) : false;
             const distFromCenter = getDistance(userLat, userLng, zone.center_lat, zone.center_lng);
 
-            if (inBounds) {
-                if (!closestZone || !isInBounds || distFromCenter < distFromClosest) {
-                    closestZone = zone; distFromClosest = distFromCenter;
-                    isInBounds = true; isInRadius = true;
-                }
-            } else if (inRadius) {
-                if (!closestZone || (isInBounds === false && (!isInRadius || distFromCenter < distFromClosest))) {
-                    closestZone = zone; distFromClosest = distFromCenter;
-                    isInRadius = true;
+            const isPointValid = hasPoly ? inPoly : inRadius;
+
+            if (isPointValid) {
+                if (!closestZone || !isValid || distFromCenter < distFromClosest) {
+                    closestZone = zone;
+                    distFromClosest = distFromCenter;
+                    isInsidePolygon = inPoly;
+                    isValid = true;
                 }
             } else {
-                if (!closestZone || (isInBounds === false && isInRadius === false && distFromCenter < distFromClosest)) {
-                    closestZone = zone; distFromClosest = distFromCenter;
+                if (!closestZone || (!isValid && distFromCenter < distFromClosest)) {
+                    closestZone = zone;
+                    distFromClosest = distFromCenter;
+                    isInsidePolygon = inPoly;
                 }
             }
         }
-        return { zone: closestZone, distance: distFromClosest, inBounds: isInBounds, inRadius: isInRadius };
+        return { 
+            zone: closestZone, 
+            distance: distFromClosest, 
+            inBounds: isValid, 
+            inRadius: false, 
+            inPolygon: isInsidePolygon 
+        };
     }
 
     function updateClockAbsen() {
@@ -370,21 +401,90 @@
     }
     setInterval(updateClockAbsen, 1000); updateClockAbsen();
 
+    function updateUserMinimap(userLat, userLng, zone, zoneInfo, dist) {
+        const container = document.getElementById('user-gps-minimap');
+        if (!container || typeof L === 'undefined') return;
+
+        if (!userMinimap) {
+            userMinimap = L.map('user-gps-minimap', { zoomControl: false, attributionControl: false }).setView([userLat, userLng], 16);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(userMinimap);
+        }
+
+        if (userMinimapMarker) userMinimap.removeLayer(userMinimapMarker);
+        if (userMinimapPolygon) userMinimap.removeLayer(userMinimapPolygon);
+        if (userMinimapLine) userMinimap.removeLayer(userMinimapLine);
+
+        const inBounds = zoneInfo ? zoneInfo.inBounds : false;
+
+        if (zone) {
+            const hasPoly = zone.polygon && Array.isArray(zone.polygon) && zone.polygon.length >= 3;
+
+            // Render Poligon OSS (Hijau jika di dalam, Merah jika di luar)
+            if (hasPoly) {
+                userMinimapPolygon = L.polygon(zone.polygon, {
+                    color: inBounds ? '#16a34a' : '#dc2626',
+                    fillColor: inBounds ? '#22c55e' : '#f87171',
+                    fillOpacity: inBounds ? 0.35 : 0.25,
+                    weight: 2.5
+                }).addTo(userMinimap);
+            }
+
+            // Garis penghubung titik user ke titik pusat kantor
+            userMinimapLine = L.polyline([[userLat, userLng], [zone.center_lat, zone.center_lng]], {
+                color: inBounds ? '#16a34a' : '#dc2626',
+                weight: 2,
+                dashArray: '4, 4'
+            }).addTo(userMinimap);
+
+            const allPoints = [[userLat, userLng], [zone.center_lat, zone.center_lng]];
+            if (hasPoly) {
+                zone.polygon.forEach(p => allPoints.push([p[0], p[1]]));
+            }
+            const bounds = L.latLngBounds(allPoints);
+            userMinimap.fitBounds(bounds, { padding: [25, 25], maxZoom: 17 });
+            setTimeout(() => { if (userMinimap) userMinimap.invalidateSize(); }, 250);
+
+            const labelEl = document.getElementById('minimap-zone-label');
+            if (labelEl) {
+                if (inBounds) {
+                    labelEl.innerHTML = `<span class="text-emerald-700 font-bold">🟢 Di Dalam Zona Poligon OSS (${Math.round(dist)}m ke pusat)</span>`;
+                } else {
+                    labelEl.innerHTML = `<span class="text-rose-700 font-bold">🔴 Di Luar Zona Poligon OSS (${Math.round(dist)}m ke pusat)</span>`;
+                }
+            }
+        }
+
+        // Marker posisi user saat ini
+        userMinimapMarker = L.circleMarker([userLat, userLng], {
+            radius: 7,
+            color: '#ffffff',
+            fillColor: inBounds ? '#16a34a' : '#dc2626',
+            fillOpacity: 1,
+            weight: 3
+        }).addTo(userMinimap);
+    }
+
     function startGPSTracking(forceRefresh = false) {
         const liveGpsText = document.getElementById('live-gps-text');
+        const refreshIcon = document.getElementById('refresh-gps-icon');
 
         if (!navigator.geolocation) {
-            if(liveGpsText) liveGpsText.innerHTML = '<span class="text-red-500">Browser tidak mendukung GPS!</span>';
+            if(liveGpsText) liveGpsText.innerHTML = '<span class="text-rose-600 font-bold">🔴 Browser tidak mendukung geolokasi GPS!</span>';
             return;
         }
 
-        if (forceRefresh && liveGpsText) {
-            liveGpsText.innerHTML = 'Mencari Satelit Baru... <i class="fas fa-spinner fa-spin"></i>';
+        if (forceRefresh) {
+            if(refreshIcon) refreshIcon.classList.add('fa-spin');
+            if (liveGpsText) {
+                liveGpsText.innerHTML = '<div class="flex items-center gap-2 text-blue-600 font-semibold text-xs"><i class="fas fa-spinner fa-spin"></i><span>Menghubungi satelit GPS...</span></div>';
+            }
             if (currentWatchId) { navigator.geolocation.clearWatch(currentWatchId); }
         }
 
         currentWatchId = navigator.geolocation.watchPosition(
             function(pos) {
+                if(refreshIcon) refreshIcon.classList.remove('fa-spin');
+
                 const lat = pos.coords.latitude;
                 const lng = pos.coords.longitude;
                 const accuracy = pos.coords.accuracy;
@@ -398,37 +498,113 @@
                 const zoneInfo = lastValidCoordinates.zoneInfo;
                 const zone = zoneInfo.zone;
                 const distance = zoneInfo.distance;
+                const maxRadius = zone ? (zone.radius_meter || 100) : 100;
+
+                // Update visual minimap dengan status Poligon & Radius
+                updateUserMinimap(lat, lng, zone, zoneInfo, distance);
 
                 if (liveGpsText) {
                     if (!zone) {
                         liveGpsText.innerHTML = `
                             <div class="text-slate-600 text-[11px] mb-1">📍 ${lat.toFixed(6)}, ${lng.toFixed(6)} | Akurasi: ±${Math.round(accuracy)}m</div>
-                            <div class="text-red-500 text-xs font-bold">Tidak ada zona yang terdeteksi</div>
+                            <div class="text-rose-600 text-xs font-bold">Tidak ada zona presensi yang terdaftar di sistem</div>
                         `;
                         return;
                     }
 
-                    let statusIcon = '🔴'; let statusColor = 'text-red-500'; let statusText = '(Di Luar Area)';
-                    if (zoneInfo.inBounds) { statusIcon = '🟢'; statusColor = 'text-green-600'; statusText = `(Siap Absen - Di Dalam ${zone.name})`; }
-                    else if (zoneInfo.inRadius) { statusIcon = '🟡'; statusColor = 'text-yellow-600'; statusText = '(Toleransi Akurasi)'; }
+                    if (zoneInfo.inBounds) {
+                        const statusTitle = 'LOKASI VALID - DI DALAM ZONA OSS KANTOR';
+                        const badgeText = 'Zona Poligon OSS';
+                        const badgeColor = 'text-indigo-800 bg-indigo-100/90 border border-indigo-200';
 
-                    liveGpsText.innerHTML = `
-                        <div class="text-slate-600 text-[10px] mb-1">📍 ${lat.toFixed(6)}, ${lng.toFixed(6)}</div>
-                        <div class="text-[10px] mb-1 text-slate-500">Radius Alat: <b class="${accuracy > 50 ? 'text-red-500' : 'text-green-600'}">${Math.round(accuracy)} meter</b></div>
-                        <div class="text-[11px]">Area: <b>${zone.name}</b></div>
-                        <div class="text-sm font-extrabold ${statusColor}">${statusIcon} Jarak ke pusat: ${Math.round(distance)}m ${statusText}</div>
-                    `;
+                        liveGpsText.innerHTML = `
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 pb-1.5 border-b border-emerald-100 mb-1.5">
+                                <div class="font-extrabold text-emerald-700 text-xs flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    <span>${statusTitle}</span>
+                                </div>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-md self-start sm:self-auto ${badgeColor}">
+                                    ${badgeText}
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                                <div>
+                                    <span class="text-slate-500">Koordinat Anda:</span>
+                                    <span class="font-mono font-bold text-slate-800 block">${lat.toFixed(6)}, ${lng.toFixed(6)}</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-500">Area Kantor:</span>
+                                    <span class="font-bold text-blue-900 block truncate">${zone.name}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mt-2 pt-1.5 border-t border-slate-100 text-[11px]">
+                                <span class="text-slate-500">Akurasi GPS: <b class="${accuracy > 50 ? 'text-amber-600' : 'text-emerald-600'}">±${Math.round(accuracy)}m</b></span>
+                                <span class="font-extrabold text-emerald-700">Jarak ke Titik Pusat: ${Math.round(distance)} meter</span>
+                            </div>
+                        `;
+                    } else {
+                        liveGpsText.innerHTML = `
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 pb-1.5 border-b border-rose-100 mb-1.5">
+                                <div class="font-extrabold text-rose-600 text-xs flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                                    <span>DI LUAR ZONA OSS PRESENSI</span>
+                                </div>
+                                <span class="text-[10px] font-bold text-rose-800 bg-rose-100/80 px-2 py-0.5 rounded-md self-start sm:self-auto">
+                                    Batas Area OSS
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                                <div>
+                                    <span class="text-slate-500">Koordinat Anda:</span>
+                                    <span class="font-mono font-bold text-slate-800 block">${lat.toFixed(6)}, ${lng.toFixed(6)}</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-500">Area Kantor:</span>
+                                    <span class="font-bold text-blue-900 block truncate">${zone.name}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mt-2 pt-1.5 border-t border-slate-100 text-[11px]">
+                                <span class="text-slate-500">Akurasi GPS: <b class="${accuracy > 50 ? 'text-amber-600' : 'text-slate-600'}">±${Math.round(accuracy)}m</b></span>
+                                <span class="font-extrabold text-rose-600">Jarak ke Titik Pusat: ${Math.round(distance)}m</span>
+                            </div>
+                        `;
+                    }
                 }
             },
             function(err) {
-                let errorMsg = '<span class="text-red-500 font-bold">🔴 Akses GPS Ditolak / Mati!</span>';
-                if(err.code === 1) errorMsg = '<span class="text-red-500 font-bold">🔴 Izinkan Lokasi di Browser!</span>';
-                if(err.code === 2) errorMsg = '<span class="text-red-500 font-bold">🔴 Nyalakan GPS di HP/PC!</span>';
-                if(err.code === 3 && !lastValidCoordinates.lat) errorMsg = '<span class="text-yellow-600 font-bold">⏳ Sinyal lambat (Mencari...)</span>';
+                if(refreshIcon) refreshIcon.classList.remove('fa-spin');
+                let errorMsg = '<div class="text-rose-600 font-bold text-xs"><i class="fas fa-exclamation-triangle mr-1"></i> Akses GPS Ditolak / Tidak Terdeteksi!</div>';
+                if(err.code === 1) errorMsg = '<div class="text-rose-600 font-bold text-xs"><i class="fas fa-exclamation-triangle mr-1"></i> Harap izinkan akses lokasi (GPS) pada browser Anda!</div>';
+                if(err.code === 2) errorMsg = '<div class="text-rose-600 font-bold text-xs"><i class="fas fa-exclamation-triangle mr-1"></i> Nyalakan fitur GPS / Lokasi pada perangkat HP/Laptop Anda!</div>';
+                if(err.code === 3 && !lastValidCoordinates.lat) errorMsg = '<div class="text-amber-600 font-bold text-xs"><i class="fas fa-spinner fa-spin mr-1"></i> Sinyal GPS lambat, sedang mencoba ulang...</div>';
 
                 if(liveGpsText) liveGpsText.innerHTML = errorMsg;
             },
             { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 }
+        );
+
+        // Ambil posisi instan sekali di awal agar tidak menunggu watch cycle
+        navigator.geolocation.getCurrentPosition(
+            function(pos) {
+                if (lastValidCoordinates.lat === null) {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    const accuracy = pos.coords.accuracy;
+
+                    lastValidCoordinates.lat = lat;
+                    lastValidCoordinates.lng = lng;
+                    lastValidCoordinates.accuracy = accuracy;
+                    lastValidCoordinates.timestamp = Date.now();
+                    lastValidCoordinates.zoneInfo = getClosestZoneWithDetails(lat, lng);
+
+                    const zoneInfo = lastValidCoordinates.zoneInfo;
+                    const zone = zoneInfo.zone;
+                    const distance = zoneInfo.distance;
+                    updateUserMinimap(lat, lng, zone, zoneInfo, distance);
+                }
+            },
+            function(e) {},
+            { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
         );
     }
 
@@ -823,9 +999,14 @@
                         return;
                     }
 
-                    if (!zoneInfo.inBounds && !zoneInfo.inRadius) {
+                    if (!zoneInfo.inBounds) {
                         resetSubmitButton();
-                        Swal.fire({ title: 'DI LUAR AREA KERJA!', html: `Anda berada di luar area yang diizinkan.<br>Batas toleransi maksimal adalah ${MAX_RADIUS_METERS} Meter.<br><br><small class="text-blue-600 font-bold">Pastikan posisi Anda masuk dalam wilayah kerja yang telah ditentukan!</small>`, icon: 'error', confirmButtonColor: '#d33' });
+                        Swal.fire({
+                            title: 'DI LUAR ZONA OSS PRESENSI!',
+                            html: `Anda berada di luar batas area Poligon OSS yang diizinkan untuk presensi.<br>Jarak ke titik kantor: <b>${Math.round(minDistance)} Meter</b> dari <b>${closestZone.name}</b>.<br><br><small class="text-blue-600 font-bold">Pastikan posisi Anda berada tepat di dalam wilayah poligon kantor!</small>`,
+                            icon: 'error',
+                            confirmButtonColor: '#004a99'
+                        });
                         return;
                     }
 

@@ -16,6 +16,12 @@ class Attendance extends Model
         'jam_masuk_lembur',
         'status',
         'catatan',
+        'foto',
+        'keterangan',
+        'latitude',
+        'longitude',
+        'jarak_meter',
+        'lokasi_nama',
         'nama_karyawan_assorting'
     ];
 

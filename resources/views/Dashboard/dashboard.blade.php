@@ -84,6 +84,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -127,29 +131,48 @@
             display: flex;
             align-items: center;
             width: 100%;
-            padding: 0.75rem 1.15rem;
+            padding: 0.72rem 1.15rem;
             margin-bottom: 0.35rem;
-            font-size: 0.85rem;
+            font-size: 0.825rem;
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.8);
-            border-radius: 1rem;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            color: rgba(255, 255, 255, 0.85);
+            border-radius: 0.85rem;
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
             text-transform: capitalize;
             letter-spacing: 0.015em;
             position: relative;
             overflow: hidden;
         }
-        .side-nav-btn i { width: 22px; margin-right: 12px; font-size: 1rem; opacity: 0.9; color: inherit; transition: 0.2s; }
-        .side-nav-btn:hover { background: rgba(255, 255, 255, 0.12); color: #ffffff; transform: translateX(3px); }
+        .side-nav-btn i {
+            width: 22px;
+            min-width: 22px;
+            text-align: center;
+            margin-right: 12px;
+            font-size: 0.95rem;
+            opacity: 0.9;
+            color: inherit;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .side-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            transform: translateX(4px);
+        }
 
         .side-nav-btn.active {
-            background: #ffffff;
-            color: #004a99;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            background: #ffffff !important;
+            color: #004a99 !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
             font-weight: 800;
             transform: translateX(0);
         }
-        .side-nav-btn.active i { opacity: 1; color: #004a99; }
+        .side-nav-btn.active i {
+            opacity: 1;
+            color: #004a99 !important;
+        }
         .side-nav-btn.active::before {
             content: '';
             position: absolute;
@@ -330,6 +353,7 @@
 
                     <div id="menu-admin" class="sub-menu-container menu-expanded space-y-1 pl-3 border-l border-white/20 ml-6">
                         <button onclick="switchTab('kelola-user')" id="btn-kelola-user" class="side-nav-btn text-blue-200 hover:text-white"><i class="fas fa-users-cog"></i> Manajemen User</button>
+                        <button onclick="switchTab('lokasi-absen')" id="btn-lokasi-absen" class="side-nav-btn text-blue-200 hover:text-white"><i class="fas fa-map-marked-alt"></i> Pengaturan Lokasi Absen</button>
                     </div>
                 @endif
 
@@ -386,7 +410,7 @@
                 </div>
             </header>
 
-            <main id="main-content" class="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-7 relative">
+            <main id="main-content" class="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 relative">
                 <div class="max-w-full mx-auto h-full flex flex-col">
 
                     {{-- HANYA KARYAWAN STANDAR YANG MERENDER FORM ABSEN --}}
@@ -404,120 +428,132 @@
                             <div class="space-y-6 animate-fade-in-up">
 
                                 {{-- Header Dashboard Utama (Donezo Style) --}}
-                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-1 pb-1">
+                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-2 sm:pt-3 pb-2 mb-1">
                                     <div>
-                                        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Dashboard Utama</h1>
+                                        <div class="flex items-center gap-3 flex-wrap">
+                                            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Dashboard Utama</h1>
+                                            {{-- Realtime Live Status Badge --}}
+                                            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50/90 text-emerald-800 border border-emerald-200/90 text-xs font-bold shadow-2xs">
+                                                <span class="relative flex h-2.5 w-2.5">
+                                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                                                </span>
+                                                <span class="font-extrabold text-emerald-900 tracking-tight">Realtime Live</span>
+                                                <span class="text-emerald-300 font-bold">•</span>
+                                                <span class="text-[11px] font-bold text-emerald-800 tracking-tight font-mono" id="realtime-last-sync">{{ \Carbon\Carbon::now('Asia/Makassar')->format('H:i:s') }} WITA</span>
+                                            </div>
+                                        </div>
                                         <p class="text-xs sm:text-sm font-medium text-slate-500 mt-1">Ringkasan statistik kehadiran, jam kerja, dan aktivitas presensi karyawan secara realtime.</p>
                                     </div>
 
-                                    {{-- WIDGET TANGGAL SEKARANG (Donezo Pill Style) --}}
-                                    <div class="w-full sm:w-auto bg-white border border-slate-200/90 hover:border-slate-300 px-4 py-2.5 rounded-2xl shadow-2xs flex items-center gap-3 transition-all cursor-pointer">
-                                        <div class="w-8 h-8 rounded-full bg-blue-50 text-indofood-blue flex items-center justify-center text-sm shrink-0">
-                                            <i class="fas fa-calendar-alt text-xs"></i>
-                                        </div>
-                                        <div class="text-left flex-1 sm:flex-none">
-                                            <label for="filter_tanggal_admin" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none cursor-pointer block mb-0.5">Tanggal Presensi</label>
-                                            <input type="date" id="filter_tanggal_admin" name="tanggal"
-                                                   value="{{ request('tanggal', \Carbon\Carbon::now('Asia/Makassar')->format('Y-m-d')) }}"
-                                                   onchange="window.location.href = window.location.pathname + '?tanggal=' + this.value + '#ringkasan';"
-                                                   class="text-xs sm:text-sm font-extrabold text-slate-800 bg-transparent border-none p-0 m-0 focus:ring-0 cursor-pointer outline-none w-full">
+                                    <div class="flex items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+                                        {{-- WIDGET TANGGAL SEKARANG (Donezo Pill Style) --}}
+                                        <div class="w-full sm:w-auto bg-white border border-slate-200/90 hover:border-blue-400 px-4 py-2.5 rounded-2xl shadow-xs hover:shadow-sm flex items-center gap-3 transition-all cursor-pointer">
+                                            <div class="w-9 h-9 rounded-xl bg-blue-50 text-indofood-blue flex items-center justify-center text-sm shrink-0 shadow-2xs">
+                                                <i class="fas fa-calendar-alt text-xs"></i>
+                                            </div>
+                                            <div class="text-left flex-1 sm:flex-none">
+                                                <label for="filter_tanggal_admin" class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider leading-none cursor-pointer block mb-0.5">Tanggal Presensi</label>
+                                                <input type="date" id="filter_tanggal_admin" name="tanggal"
+                                                       value="{{ request('tanggal', \Carbon\Carbon::now('Asia/Makassar')->format('Y-m-d')) }}"
+                                                       onchange="handleDateFilterChange(this.value);"
+                                                       class="text-xs sm:text-sm font-black text-slate-800 bg-transparent border-none p-0 m-0 focus:ring-0 cursor-pointer outline-none w-full font-mono">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 {{-- ========================================== --}}
-                                {{-- WIDGET KARTU STATISTIK (DONEZO STYLE) --}}
+                                {{-- WIDGET KARTU STATISTIK (DONEZO STYLE - UNIFORM WHITE) --}}
                                 {{-- ========================================== --}}
                                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mt-2">
-                                    {{-- Card 1: Featured Card (Total Hadir) - Indofood Blue --}}
-                                    <div class="bg-indofood-blue text-white rounded-3xl p-5 sm:p-6 shadow-xl shadow-blue-900/15 relative overflow-hidden flex flex-col justify-between min-h-[145px] sm:min-h-[160px] group hover:-translate-y-1 transition-all duration-300">
-                                        <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
-
-                                        <div class="flex items-center justify-between relative z-10">
-                                            <span class="text-xs sm:text-sm font-bold text-blue-100 tracking-wide">Total Hadir</span>
-                                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center text-white text-xs font-bold shadow-2xs group-hover:bg-white group-hover:text-indofood-blue transition-colors">
-                                                <i class="fas fa-arrow-up-right"></i>
+                                    {{-- Card 1: Total Hadir --}}
+                                    <div id="card-hadir" class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-100 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between min-h-[145px] sm:min-h-[160px] group">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs sm:text-sm font-bold text-slate-500 tracking-wide">Total Hadir</span>
+                                            <div class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100/80 flex items-center justify-center text-xs font-bold group-hover:bg-emerald-600 group-hover:text-white transition-colors shadow-2xs">
+                                                <i class="fas fa-user-check"></i>
                                             </div>
                                         </div>
 
-                                        <div class="relative z-10 my-2">
-                                            <h3 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-none">
+                                        <div class="my-2">
+                                            <h3 id="stat-count-hadir" class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-none transition-all duration-300">
                                                 {{ $countHadir ?? 0 }}
                                             </h3>
                                         </div>
 
-                                        <div class="relative z-10">
-                                            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/15 text-[11px] font-semibold text-blue-50 backdrop-blur-2xs">
-                                                <i class="fas fa-check-circle text-[10px] text-emerald-300"></i>
+                                        <div>
+                                            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100/80 text-[11px] font-bold">
+                                                <i class="fas fa-check-circle text-[10px] text-emerald-500"></i>
                                                 <span>Hadir hari ini</span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {{-- Card 2: Total Lembur - Donezo White Card --}}
-                                    <div class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-2xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between min-h-[145px] sm:min-h-[160px] group">
+                                    {{-- Card 2: Total Lembur --}}
+                                    <div id="card-lembur" class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-100 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between min-h-[145px] sm:min-h-[160px] group">
                                         <div class="flex items-center justify-between">
                                             <span class="text-xs sm:text-sm font-bold text-slate-500 tracking-wide">Total Lembur</span>
-                                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-purple-50 text-purple-600 border border-purple-100/80 flex items-center justify-center text-xs font-bold group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                                                <i class="fas fa-arrow-up-right"></i>
+                                            <div class="w-8 h-8 rounded-full bg-purple-50 text-purple-600 border border-purple-100/80 flex items-center justify-center text-xs font-bold group-hover:bg-purple-600 group-hover:text-white transition-colors shadow-2xs">
+                                                <i class="fas fa-business-time"></i>
                                             </div>
                                         </div>
 
                                         <div class="my-2">
-                                            <h3 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-none">
+                                            <h3 id="stat-count-lembur" class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-none transition-all duration-300">
                                                 {{ $countLembur ?? 0 }}
                                             </h3>
                                         </div>
 
                                         <div>
-                                            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-100/80 text-[11px] font-semibold">
-                                                <i class="fas fa-clock text-[10px]"></i>
+                                            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-100/80 text-[11px] font-bold">
+                                                <i class="fas fa-clock text-[10px] text-purple-500"></i>
                                                 <span>Jam lembur aktif</span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {{-- Card 3: Izin / Sakit - Donezo White Card --}}
-                                    <div class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-2xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between min-h-[145px] sm:min-h-[160px] group">
+                                    {{-- Card 3: Izin / Sakit --}}
+                                    <div id="card-izin" class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-100 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between min-h-[145px] sm:min-h-[160px] group">
                                         <div class="flex items-center justify-between">
                                             <span class="text-xs sm:text-sm font-bold text-slate-500 tracking-wide">Izin / Sakit</span>
-                                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-amber-50 text-amber-600 border border-amber-100/80 flex items-center justify-center text-xs font-bold group-hover:bg-amber-500 group-hover:text-white transition-colors">
-                                                <i class="fas fa-arrow-up-right"></i>
+                                            <div class="w-8 h-8 rounded-full bg-amber-50 text-amber-600 border border-amber-100/80 flex items-center justify-center text-xs font-bold group-hover:bg-amber-500 group-hover:text-white transition-colors shadow-2xs">
+                                                <i class="fas fa-file-medical"></i>
                                             </div>
                                         </div>
 
                                         <div class="my-2">
-                                            <h3 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-none">
+                                            <h3 id="stat-count-izin" class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-none transition-all duration-300">
                                                 {{ $countIzin ?? 0 }}
                                             </h3>
                                         </div>
 
                                         <div>
-                                            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100/80 text-[11px] font-semibold">
-                                                <i class="fas fa-file-medical text-[10px]"></i>
-                                                <span>Dispensasi & cuti</span>
+                                            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100/80 text-[11px] font-bold">
+                                                <i class="fas fa-user-clock text-[10px] text-amber-500"></i>
+                                                <span>Izin / sakit tercatat</span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {{-- Card 4: Tanpa Keterangan - Donezo White Card --}}
-                                    <div class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-2xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between min-h-[145px] sm:min-h-[160px] group">
+                                    {{-- Card 4: Tanpa Keterangan / Belum Clock-in --}}
+                                    <div id="card-alpa" class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-100 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between min-h-[145px] sm:min-h-[160px] group">
                                         <div class="flex items-center justify-between">
-                                            <span class="text-xs sm:text-sm font-bold text-slate-500 tracking-wide">Tanpa Ket.</span>
-                                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 text-slate-600 border border-slate-200/80 flex items-center justify-center text-xs font-bold group-hover:bg-slate-700 group-hover:text-white transition-colors">
-                                                <i class="fas fa-arrow-up-right"></i>
+                                            <span class="text-xs sm:text-sm font-bold text-slate-500 tracking-wide" title="Karyawan yang belum melakukan clock-in atau tidak ada keterangan">Belum Clock-in / Tanpa Ket.</span>
+                                            <div class="w-8 h-8 rounded-full bg-rose-50 text-rose-600 border border-rose-100/80 flex items-center justify-center text-xs font-bold group-hover:bg-rose-600 group-hover:text-white transition-colors shadow-2xs">
+                                                <i class="fas fa-user-times"></i>
                                             </div>
                                         </div>
 
                                         <div class="my-2">
-                                            <h3 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-none">
+                                            <h3 id="stat-count-alpa" class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-none transition-all duration-300">
                                                 {{ $countAlpa ?? 0 }}
                                             </h3>
                                         </div>
 
                                         <div>
-                                            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200/80 text-[11px] font-semibold">
-                                                <i class="fas fa-exclamation-circle text-[10px]"></i>
+                                            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-100/80 text-[11px] font-bold">
+                                                <i class="fas fa-exclamation-circle text-[10px] text-rose-500"></i>
                                                 <span>Perlu konfirmasi</span>
                                             </div>
                                         </div>
@@ -526,35 +562,51 @@
 
                                 {{-- Area Grafik / Chart (Donezo Style) --}}
                                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6 mt-2">
-                                    {{-- 1. Bar Chart (Project Analytics) --}}
-                                    <div class="bg-white rounded-3xl p-6 sm:p-7 shadow-2xs border border-slate-200/80 flex flex-col justify-between hover:shadow-md transition-all duration-300">
+                                    {{-- 1. Bar Chart: Tren Kehadiran Mingguan --}}
+                                    <div class="bg-white rounded-3xl p-6 sm:p-7 shadow-xs border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all duration-300">
                                         <div class="flex items-center justify-between pb-3">
                                             <div>
-                                                <h3 class="text-lg font-extrabold text-slate-900 tracking-tight">Project Analytics</h3>
+                                                <h3 class="text-lg font-extrabold text-slate-900 tracking-tight">Tren Kehadiran Mingguan</h3>
                                                 <p class="text-xs text-slate-400 font-medium mt-0.5">Tren statistik presensi 7 hari terakhir</p>
                                             </div>
                                             <span class="px-3 py-1 rounded-full bg-slate-50 text-[11px] font-bold text-slate-600 border border-slate-200/70">
                                                 7 Hari
                                             </span>
                                         </div>
-                                        <div class="relative w-full flex-1 flex items-center justify-center min-h-[300px] max-h-[330px]">
+                                        <div class="relative w-full flex-1 flex flex-col items-center justify-center min-h-[300px] max-h-[330px]">
                                             <canvas id="barChart" class="w-full h-full"></canvas>
+                                        </div>
+                                        {{-- Empty State Note for Bar Chart --}}
+                                        <div id="bar-empty-note" class="pt-2 text-center text-[11px] font-medium text-slate-400 flex items-center justify-center gap-1.5 {{ ($countHadir ?? 0) == 0 ? '' : 'hidden' }}">
+                                            <i class="fas fa-info-circle text-blue-400"></i>
+                                            <span>Menunggu data presensi masuk untuk 7 hari terakhir</span>
                                         </div>
                                     </div>
 
-                                    {{-- 2. Semi-Circle Gauge (Project Progress) --}}
-                                    <div class="bg-white rounded-3xl p-6 sm:p-7 shadow-2xs border border-slate-200/80 flex flex-col justify-between hover:shadow-md transition-all duration-300">
+                                    {{-- 2. Semi-Circle Gauge: Rasio Kehadiran Hari Ini --}}
+                                    <div class="bg-white rounded-3xl p-6 sm:p-7 shadow-xs border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all duration-300">
                                         <div class="flex items-center justify-between pb-3">
                                             <div>
-                                                <h3 class="text-lg font-extrabold text-slate-900 tracking-tight">Project Progress</h3>
-                                                <p class="text-xs text-slate-400 font-medium mt-0.5">Rasio kehadiran karyawan hari ini</p>
+                                                <h3 class="text-lg font-extrabold text-slate-900 tracking-tight">Rasio Kehadiran Hari Ini</h3>
+                                                <p class="text-xs text-slate-400 font-medium mt-0.5">Persentase karyawan yang sudah melakukan presensi</p>
                                             </div>
                                             <span class="px-3 py-1 rounded-full bg-blue-50 text-[11px] font-bold text-indofood-blue border border-blue-100">
                                                 Hari Ini
                                             </span>
                                         </div>
-                                        <div class="relative w-full flex-1 flex items-center justify-center min-h-[210px] max-h-[240px]">
+                                        <div class="relative w-full flex-1 flex flex-col items-center justify-center min-h-[210px] max-h-[240px]">
                                             <canvas id="pieChart" class="w-full h-full"></canvas>
+                                        </div>
+
+                                        {{-- Status / Empty state helper text --}}
+                                        <div id="gauge-empty-note" class="text-center text-[11px] font-medium text-slate-400 pt-1 pb-1 flex items-center justify-center gap-1.5">
+                                            @if(($countHadir ?? 0) == 0)
+                                                <i class="fas fa-clock text-amber-500 text-xs"></i>
+                                                <span>Menunggu data presensi masuk hari ini</span>
+                                            @else
+                                                <i class="fas fa-check-circle text-emerald-500 text-xs"></i>
+                                                <span>{{ $countHadir }} dari {{ ($countHadir ?? 0) + ($countLembur ?? 0) + ($countIzin ?? 0) + ($countAlpa ?? 0) }} karyawan telah presensi</span>
+                                            @endif
                                         </div>
 
                                         {{-- Custom Donezo Legend at the bottom --}}
@@ -564,7 +616,7 @@
                                                 <span class="text-xs font-bold text-slate-700">Hadir</span>
                                             </div>
                                             <div class="flex items-center gap-2">
-                                                <span class="w-2.5 h-2.5 rounded-full bg-slate-900 shadow-2xs"></span>
+                                                <span class="w-2.5 h-2.5 rounded-full bg-purple-600 shadow-2xs"></span>
                                                 <span class="text-xs font-bold text-slate-700">Lembur</span>
                                             </div>
                                             <div class="flex items-center gap-2">
@@ -572,7 +624,7 @@
                                                 <span class="text-xs font-bold text-slate-700">Izin</span>
                                             </div>
                                             <div class="flex items-center gap-2">
-                                                <span class="w-3.5 h-3.5 rounded-xs border border-slate-300 relative overflow-hidden shadow-2xs" style="background: repeating-linear-gradient(45deg, #cbd5e1, #cbd5e1 2px, #f8fafc 2px, #f8fafc 6px);"></span>
+                                                <span class="w-2.5 h-2.5 rounded-full bg-slate-300 shadow-2xs"></span>
                                                 <span class="text-xs font-bold text-slate-700">Tanpa Ket.</span>
                                             </div>
                                         </div>
@@ -909,6 +961,7 @@
 
                     @if($isSuperAdmin)
                         @include('dashboard.users')
+                        @include('Dashboard.lokasi_absen')
                     @endif
 
                     @if($isSuperAdmin || $isAdminAbsensi || $isAdminPenilaian)
@@ -1044,8 +1097,11 @@
             const timeStr = new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Makassar', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(now);
             const label = document.getElementById('wita-header-display');
             if(label) label.innerText = "System Time: " + timeStr + " WITA";
+            const liveBadgeClock = document.getElementById('realtime-last-sync');
+            if(liveBadgeClock) liveBadgeClock.innerText = timeStr + " WITA";
         }
         setInterval(updateWitaClock, 1000);
+        updateWitaClock();
 
         @if(session('success'))
             Swal.fire({ title: 'BERHASIL!', text: "{{ session('success') }}", icon: 'success', confirmButtonColor: '#004a99' });
@@ -1086,7 +1142,7 @@
             const isAdminOutsourcing = {{ $isAdminOutsourcing ? 'true' : 'false' }};
             const isStandar = {{ $isStandar ? 'true' : 'false' }};
 
-            if(id === 'kelola-user' && !isSuperAdmin) {
+            if((id === 'kelola-user' || id === 'lokasi-absen') && !isSuperAdmin) {
                 Swal.fire('Akses Ditolak', 'Hanya Super Admin yang bisa mengakses menu ini.', 'error');
                 return;
             }
@@ -1128,6 +1184,7 @@
                 'stationery': 'Master Stok',
                 'transaksi-stationery': 'Transaksi Barang',
                 'kelola-user': 'Manajemen User',
+                'lokasi-absen': 'Pengaturan Lokasi & Radius Presensi',
                 'laporan-stationery': 'Laporan Barang',
                 'pengadaan-stationery': 'Pengadaan Barang',
                 'closing-stationery': 'Closing Periode',
@@ -1191,6 +1248,20 @@
                         }
                     }, waktu);
                 });
+                if (typeof window.fetchRealtimeStats === 'function') {
+                    window.fetchRealtimeStats(false);
+                }
+            }
+
+            if(id === 'form-absen') {
+                setTimeout(() => {
+                    if (typeof userMinimap !== 'undefined' && userMinimap) {
+                        userMinimap.invalidateSize();
+                    }
+                    if (typeof startGPSTracking === 'function') {
+                        startGPSTracking();
+                    }
+                }, 400);
             }
 
             if(window.innerWidth <= 1024) {
@@ -1450,7 +1521,7 @@
             const isAdminOutsourcing = {{ $isAdminOutsourcing ? 'true' : 'false' }};
             const isStandar = {{ $isStandar ? 'true' : 'false' }};
 
-            const validTabs = ['ringkasan', 'form-absen', 'karyawan', 'master-shift', 'jadwal-karyawan', 'input', 'input-lembur', 'rekap', 'lembur', 'pengajuan-spl', 'rekap-spl', 'kelola-user', 'stationery', 'analitik-stationery', 'transaksi-stationery', 'laporan-stationery', 'pengadaan-stationery', 'closing-stationery', 'aspek-penilaian', 'laporan-penilaian'];
+            const validTabs = ['ringkasan', 'form-absen', 'karyawan', 'master-shift', 'jadwal-karyawan', 'input', 'input-lembur', 'rekap', 'lembur', 'pengajuan-spl', 'rekap-spl', 'kelola-user', 'lokasi-absen', 'stationery', 'analitik-stationery', 'transaksi-stationery', 'laporan-stationery', 'pengadaan-stationery', 'closing-stationery', 'aspek-penilaian', 'laporan-penilaian'];
 
             const storedTab = (() => {
                 try {
@@ -1589,6 +1660,28 @@
                 }
 
                 // ==============================================================
+                // REALTIME DASHBOARD STATE & CHART REFERENCES
+                // ==============================================================
+                let realtimeBarPeakIdx = -1;
+                let realtimeBarPctText = '0%';
+                let realtimeBarRawLabels = @json($trendLabels ?? []);
+                let realtimeBarRawHadir = @json($trendHadir ?? []);
+                let realtimeBarTotalStaff = {{ ($countHadir ?? 0) + ($countLembur ?? 0) + ($countIzin ?? 0) + ($countAlpa ?? 0) }};
+                let realtimeDayLetters = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+                let realtimeGaugeHadir = {{ $countHadir ?? 0 }};
+                let realtimeGaugeLembur = {{ $countLembur ?? 0 }};
+                let realtimeGaugeIzin = {{ $countIzin ?? 0 }};
+                let realtimeGaugeAlpa = {{ $countAlpa ?? 0 }};
+                let realtimeGaugeTotalReal = {{ ($countHadir ?? 0) + ($countLembur ?? 0) + ($countIzin ?? 0) + ($countAlpa ?? 0) }};
+
+                let gradHadirActiveRef = null;
+                let gradHadirDarkRef = null;
+                let patternStripedRef = null;
+                let gradCompletedRef = null;
+                let patternPendingRef = null;
+
+                // ==============================================================
                 // 1. PROJECT ANALYTICS BAR CHART (DONEZO CAPSULE & STRIPE STYLE)
                 // ==============================================================
                 try {
@@ -1597,44 +1690,42 @@
                         let ctxBar = barChartCanvas.getContext('2d');
                         
                         // Active solid/gradients
-                        let gradHadirActive = ctxBar.createLinearGradient(0, 0, 0, 300);
-                        gradHadirActive.addColorStop(0, '#0284c7');
-                        gradHadirActive.addColorStop(1, '#004a99');
+                        gradHadirActiveRef = ctxBar.createLinearGradient(0, 0, 0, 300);
+                        gradHadirActiveRef.addColorStop(0, '#0284c7');
+                        gradHadirActiveRef.addColorStop(1, '#004a99');
 
-                        let gradHadirDark = ctxBar.createLinearGradient(0, 0, 0, 300);
-                        gradHadirDark.addColorStop(0, '#0369a1');
-                        gradHadirDark.addColorStop(1, '#002b5c');
+                        gradHadirDarkRef = ctxBar.createLinearGradient(0, 0, 0, 300);
+                        gradHadirDarkRef.addColorStop(0, '#0369a1');
+                        gradHadirDarkRef.addColorStop(1, '#002b5c');
 
-                        let patternStriped = createStripePattern('#cbd5e1', '#f8fafc', 2.5, 14);
+                        patternStripedRef = createStripePattern('#cbd5e1', '#f8fafc', 2.5, 14);
 
-                        const rawLabels = @json($trendLabels ?? []);
-                        const rawHadir = @json($trendHadir ?? []);
-                        
-                        // Day initials matching Donezo (S, M, T, W, T, F, S)
                         const defaultLetters = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-                        const dayLetters = rawLabels.length === 7 
-                            ? rawLabels.map((lbl, idx) => defaultLetters[idx % 7])
+                        realtimeDayLetters = realtimeBarRawLabels.length === 7 
+                            ? realtimeBarRawLabels.map((lbl, idx) => defaultLetters[idx % 7])
                             : defaultLetters;
 
-                        const maxHadirVal = Math.max(...rawHadir, 0);
+                        const maxHadirVal = Math.max(...realtimeBarRawHadir, 0);
                         let peakIdx = -1;
                         let highest = 0;
-                        rawHadir.forEach((val, idx) => {
-                            if (val > highest) {
-                                highest = val;
-                                peakIdx = idx;
-                            }
-                        });
-                        if (peakIdx === -1) peakIdx = 2; // Default Tuesday (Donezo reference)
+                        if (maxHadirVal > 0) {
+                            realtimeBarRawHadir.forEach((val, idx) => {
+                                if (val > highest) {
+                                    highest = val;
+                                    peakIdx = idx;
+                                }
+                            });
+                        }
+                        realtimeBarPeakIdx = peakIdx;
 
-                        const totalStaff = {{ ($countHadir ?? 0) + ($countLembur ?? 0) + ($countIzin ?? 0) + ($countAlpa ?? 0) }};
-                        const actualPeakVal = rawHadir[peakIdx] || 0;
-                        const pctText = totalStaff > 0 && actualPeakVal > 0 
-                            ? Math.round((actualPeakVal / totalStaff) * 100) + '%' 
-                            : '74%';
+                        const actualPeakVal = peakIdx >= 0 ? (realtimeBarRawHadir[peakIdx] || 0) : 0;
+                        realtimeBarPctText = realtimeBarTotalStaff > 0 && actualPeakVal > 0 
+                            ? Math.round((actualPeakVal / realtimeBarTotalStaff) * 100) + '%' 
+                            : '0%';
 
-                        // Cadence of bar heights matching Donezo's natural aesthetics (between 60% and 95%)
+                        // Cadence of bar heights matching Donezo's natural aesthetics
                         const donezoStripedCadence = [65, 78, 74, 94, 85, 62, 75];
+                        const emptyPlaceholderCadence = [28, 28, 28, 28, 28, 28, 28];
 
                         const displayValues = [];
                         const barColors = [];
@@ -1642,38 +1733,47 @@
                         const borderWidths = [];
 
                         for (let idx = 0; idx < 7; idx++) {
-                            const val = rawHadir[idx] !== undefined ? rawHadir[idx] : 0;
+                            const val = realtimeBarRawHadir[idx] !== undefined ? realtimeBarRawHadir[idx] : 0;
                             if (val > 0) {
                                 // Scale active attendance height dynamically between 68 and 96
                                 const scaledH = maxHadirVal > 0 
                                     ? 68 + Math.round((val / maxHadirVal) * 26) 
                                     : 78;
                                 displayValues.push(scaledH);
-                                if (idx === peakIdx) {
-                                    barColors.push(gradHadirActive);
+                                if (idx === realtimeBarPeakIdx) {
+                                    barColors.push(gradHadirActiveRef);
                                 } else {
-                                    barColors.push(gradHadirDark);
+                                    barColors.push(gradHadirDarkRef);
                                 }
                                 borderColors.push('transparent');
                                 borderWidths.push(0);
                             } else {
-                                // Inactive/Weekend/0-attendance days show Donezo striped capsule pills
-                                displayValues.push(donezoStripedCadence[idx % 7]);
-                                barColors.push(patternStriped);
-                                borderColors.push('#cbd5e1');
-                                borderWidths.push(1.5);
+                                if (maxHadirVal === 0) {
+                                    displayValues.push(emptyPlaceholderCadence[idx]);
+                                    barColors.push('#f1f5f9');
+                                    borderColors.push('#e2e8f0');
+                                    borderWidths.push(1);
+                                } else {
+                                    displayValues.push(donezoStripedCadence[idx % 7]);
+                                    barColors.push(patternStripedRef);
+                                    borderColors.push('#cbd5e1');
+                                    borderWidths.push(1.5);
+                                }
                             }
                         }
 
-                        // Plugin for floating pill badge above peak bar (Donezo '74%' badge)
+                        // Plugin for floating pill badge above peak bar (Donezo badge)
                         const donezoFloatingBadgePlugin = {
                             id: 'donezoFloatingBadge',
                             afterDatasetsDraw(chart) {
+                                const maxVal = Math.max(...realtimeBarRawHadir, 0);
+                                if (maxVal <= 0 || realtimeBarPeakIdx < 0) return; // Do not draw floating badge if 0%
+
                                 const meta = chart.getDatasetMeta(0);
                                 if (!meta || !meta.data || !meta.data.length) return;
-                                if (peakIdx < 0 || peakIdx >= meta.data.length) return;
+                                if (realtimeBarPeakIdx >= meta.data.length) return;
                                 
-                                const bar = meta.data[peakIdx];
+                                const bar = meta.data[realtimeBarPeakIdx];
                                 if (!bar) return;
 
                                 const ctx = chart.ctx;
@@ -1712,7 +1812,7 @@
                                 ctx.font = "800 11px 'Plus Jakarta Sans', sans-serif";
                                 ctx.textAlign = 'center';
                                 ctx.textBaseline = 'middle';
-                                ctx.fillText(pctText, x, badgeY + (badgeH / 2));
+                                ctx.fillText(realtimeBarPctText, x, badgeY + (badgeH / 2));
 
                                 ctx.restore();
                             }
@@ -1721,7 +1821,7 @@
                         ringkasanBarChart = new Chart(barChartCanvas, {
                             type: 'bar',
                             data: {
-                                labels: dayLetters,
+                                labels: realtimeDayLetters,
                                 datasets: [{
                                     data: displayValues,
                                     backgroundColor: barColors,
@@ -1752,13 +1852,13 @@
                                         callbacks: {
                                             title: function(items) {
                                                 const idx = items[0].dataIndex;
-                                                return rawLabels[idx] || `Hari ${dayLetters[idx]}`;
+                                                return realtimeBarRawLabels[idx] || `Hari ${realtimeDayLetters[idx] || (idx + 1)}`;
                                             },
                                             label: function(context) {
                                                 const idx = context.dataIndex;
-                                                const val = rawHadir[idx] || 0;
+                                                const val = realtimeBarRawHadir[idx] || 0;
                                                 if (val > 0) {
-                                                    const rate = totalStaff > 0 ? Math.round((val / totalStaff) * 100) : 0;
+                                                    const rate = realtimeBarTotalStaff > 0 ? Math.round((val / realtimeBarTotalStaff) * 100) : 0;
                                                     return ` Kehadiran: ${val} Orang (${rate}%)`;
                                                 }
                                                 return ' Libur / Tidak ada presensi';
@@ -1796,26 +1896,26 @@
                     if (pieChartCanvas) {
                         let ctxGauge = pieChartCanvas.getContext('2d');
                         
-                        let patternPending = createStripePattern('#94a3b8', '#f8fafc', 2.5, 14);
+                        patternPendingRef = createStripePattern('#94a3b8', '#f8fafc', 2.5, 14);
 
-                        let gradCompleted = ctxGauge.createLinearGradient(0, 0, 0, 240);
-                        gradCompleted.addColorStop(0, '#0284c7');
-                        gradCompleted.addColorStop(1, '#004a99');
+                        gradCompletedRef = ctxGauge.createLinearGradient(0, 0, 0, 240);
+                        gradCompletedRef.addColorStop(0, '#0284c7');
+                        gradCompletedRef.addColorStop(1, '#004a99');
 
-                        let colorInProgress = '#0f172a';
+                        let colorInProgress = '#7c3aed';
                         let colorIzin = '#f59e0b';
 
-                        const cHadir = {{ $countHadir ?? 0 }};
-                        const cLembur = {{ $countLembur ?? 0 }};
-                        const cIzin = {{ $countIzin ?? 0 }};
-                        const cAlpa = {{ $countAlpa ?? 0 }};
+                        const isGaugeEmpty = (realtimeGaugeHadir === 0 && realtimeGaugeLembur === 0 && realtimeGaugeIzin === 0);
 
-                        const totalReal = cHadir + cLembur + cIzin + cAlpa;
-                        const gaugeData = totalReal > 0 
-                            ? [cHadir, cLembur, cIzin, Math.max(cAlpa, 1)] 
-                            : [41, 15, 5, 39];
+                        const gaugeData = realtimeGaugeTotalReal > 0 
+                            ? (isGaugeEmpty 
+                                ? [0, 0, 0, realtimeGaugeAlpa || 1] 
+                                : [realtimeGaugeHadir, realtimeGaugeLembur, realtimeGaugeIzin, Math.max(realtimeGaugeAlpa, 0)]) 
+                            : [0, 0, 0, 1];
 
-                        const gaugeColors = [gradCompleted, colorInProgress, colorIzin, patternPending];
+                        const gaugeColors = isGaugeEmpty
+                            ? ['#e2e8f0', '#e2e8f0', '#e2e8f0', '#f1f5f9']
+                            : [gradCompletedRef, colorInProgress, colorIzin, '#e2e8f0'];
 
                         // Plugin for Donezo Big Center Percentage & Subtitle
                         const donezoGaugeCenterPlugin = {
@@ -1838,17 +1938,18 @@
                                 
                                 const midY = centerY - (innerRadius * 0.48);
 
-                                const pct = totalReal > 0 ? Math.round((cHadir / totalReal) * 100) : 41;
+                                const pct = realtimeGaugeTotalReal > 0 ? Math.round((realtimeGaugeHadir / realtimeGaugeTotalReal) * 100) : 0;
 
                                 // Large bold percentage
                                 ctx.font = "800 36px 'Plus Jakarta Sans', sans-serif";
-                                ctx.fillStyle = "#0f172a";
+                                ctx.fillStyle = pct > 0 ? "#0f172a" : "#94a3b8";
                                 ctx.fillText(pct + "%", centerX, midY - 10);
 
                                 // Subtitle
                                 ctx.font = "700 11px 'Plus Jakarta Sans', sans-serif";
-                                ctx.fillStyle = "#64748b";
-                                ctx.fillText("Presensi Selesai", centerX, midY + 16);
+                                ctx.fillStyle = pct > 0 ? "#64748b" : "#94a3b8";
+                                const subtitleText = pct > 0 ? "Presensi Selesai" : "Menunggu Presensi";
+                                ctx.fillText(subtitleText, centerX, midY + 16);
 
                                 ctx.restore();
                             }
@@ -1889,8 +1990,10 @@
                                         callbacks: {
                                             label: function(context) {
                                                 const label = context.label || '';
-                                                const val = totalReal > 0 ? [cHadir, cLembur, cIzin, cAlpa][context.dataIndex] : context.raw;
-                                                const p = totalReal > 0 ? Math.round((val / totalReal) * 100) : 25;
+                                                const val = realtimeGaugeTotalReal > 0 
+                                                    ? [realtimeGaugeHadir, realtimeGaugeLembur, realtimeGaugeIzin, realtimeGaugeAlpa][context.dataIndex] 
+                                                    : context.raw;
+                                                const p = realtimeGaugeTotalReal > 0 ? Math.round((val / realtimeGaugeTotalReal) * 100) : 25;
                                                 return ` ${label}: ${val} Orang (${p}%)`;
                                             }
                                         }
@@ -1901,6 +2004,268 @@
                         });
                     }
                 } catch(e) { console.error("Gagal render Donezo Gauge Chart:", e); }
+
+                // ==============================================================
+                // 3. REALTIME SYNC ENGINE (POLLING, ANIMATION, & MANUAL TRIGGER)
+                // ==============================================================
+                function animateValue(elem, start, end, duration = 650) {
+                    if (!elem) return;
+                    if (isNaN(start)) start = 0;
+                    if (isNaN(end)) end = 0;
+                    if (start === end) {
+                        elem.innerText = end;
+                        return;
+                    }
+                    const range = end - start;
+                    const startTime = performance.now();
+
+                    function updateCounter(currentTime) {
+                        const elapsed = currentTime - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        const ease = 1 - (1 - progress) * (1 - progress);
+                        const currentVal = Math.round(start + (range * ease));
+                        elem.innerText = currentVal;
+                        if (progress < 1) {
+                            requestAnimationFrame(updateCounter);
+                        } else {
+                            elem.innerText = end;
+                        }
+                    }
+                    requestAnimationFrame(updateCounter);
+                }
+
+                function highlightCardChange(cardId) {
+                    const card = document.getElementById(cardId);
+                    if (!card) return;
+                    card.classList.add('ring-4', 'ring-blue-400/40', 'scale-[1.02]');
+                    setTimeout(() => {
+                        card.classList.remove('ring-4', 'ring-blue-400/40', 'scale-[1.02]');
+                    }, 1000);
+                }
+
+                window.updateDashboardRealtime = function(data) {
+                    if (!data) return;
+
+                    // 1. Total Hadir
+                    const hadirEl = document.getElementById('stat-count-hadir');
+                    if (hadirEl) {
+                        const curHadir = parseInt(hadirEl.innerText.replace(/[^0-9]/g, '')) || 0;
+                        const newHadir = parseInt(data.countHadir) || 0;
+                        if (curHadir !== newHadir) {
+                            animateValue(hadirEl, curHadir, newHadir);
+                            highlightCardChange('card-hadir');
+                        }
+                    }
+
+                    // 2. Total Lembur
+                    const lemburEl = document.getElementById('stat-count-lembur');
+                    if (lemburEl) {
+                        const curLembur = parseInt(lemburEl.innerText.replace(/[^0-9]/g, '')) || 0;
+                        const newLembur = parseInt(data.countLembur) || 0;
+                        if (curLembur !== newLembur) {
+                            animateValue(lemburEl, curLembur, newLembur);
+                            highlightCardChange('card-lembur');
+                        }
+                    }
+
+                    // 3. Izin / Sakit
+                    const izinEl = document.getElementById('stat-count-izin');
+                    if (izinEl) {
+                        const curIzin = parseInt(izinEl.innerText.replace(/[^0-9]/g, '')) || 0;
+                        const newIzin = parseInt(data.countIzin) || 0;
+                        if (curIzin !== newIzin) {
+                            animateValue(izinEl, curIzin, newIzin);
+                            highlightCardChange('card-izin');
+                        }
+                    }
+
+                    // 4. Tanpa Keterangan
+                    const alpaEl = document.getElementById('stat-count-alpa');
+                    if (alpaEl) {
+                        const curAlpa = parseInt(alpaEl.innerText.replace(/[^0-9]/g, '')) || 0;
+                        const newAlpa = parseInt(data.countAlpa) || 0;
+                        if (curAlpa !== newAlpa) {
+                            animateValue(alpaEl, curAlpa, newAlpa);
+                            highlightCardChange('card-alpa');
+                        }
+                    }
+
+                    // 5. Update Time Sync Badge
+                    const syncEl = document.getElementById('realtime-last-sync');
+                    if (syncEl && data.lastUpdated) {
+                        syncEl.innerText = data.lastUpdated;
+                    }
+
+                    // 6. Update Tren Kehadiran Mingguan Bar Chart
+                    if (ringkasanBarChart && Array.isArray(data.trendLabels) && Array.isArray(data.trendHadir)) {
+                        realtimeBarRawLabels = data.trendLabels;
+                        realtimeBarRawHadir = data.trendHadir.map(v => parseInt(v) || 0);
+                        realtimeBarTotalStaff = parseInt(data.totalStaff) || parseInt(data.totalReal) || 0;
+
+                        const defaultLetters = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+                        realtimeDayLetters = realtimeBarRawLabels.length === 7 
+                            ? realtimeBarRawLabels.map((lbl, idx) => defaultLetters[idx % 7])
+                            : defaultLetters;
+
+                        const maxHadirVal = Math.max(...realtimeBarRawHadir, 0);
+                        let peakIdx = -1;
+                        let highest = 0;
+                        if (maxHadirVal > 0) {
+                            realtimeBarRawHadir.forEach((val, idx) => {
+                                if (val > highest) {
+                                    highest = val;
+                                    peakIdx = idx;
+                                }
+                            });
+                        }
+                        realtimeBarPeakIdx = peakIdx;
+
+                        const actualPeakVal = peakIdx >= 0 ? (realtimeBarRawHadir[peakIdx] || 0) : 0;
+                        realtimeBarPctText = realtimeBarTotalStaff > 0 && actualPeakVal > 0 
+                            ? Math.round((actualPeakVal / realtimeBarTotalStaff) * 100) + '%' 
+                            : '0%';
+
+                        const donezoStripedCadence = [65, 78, 74, 94, 85, 62, 75];
+                        const emptyPlaceholderCadence = [28, 28, 28, 28, 28, 28, 28];
+                        const newDisplayValues = [];
+                        const newBarColors = [];
+                        const newBorderColors = [];
+                        const newBorderWidths = [];
+
+                        for (let idx = 0; idx < 7; idx++) {
+                            const val = realtimeBarRawHadir[idx] !== undefined ? realtimeBarRawHadir[idx] : 0;
+                            if (val > 0) {
+                                const scaledH = maxHadirVal > 0 
+                                    ? 68 + Math.round((val / maxHadirVal) * 26) 
+                                    : 78;
+                                newDisplayValues.push(scaledH);
+                                if (idx === realtimeBarPeakIdx) {
+                                    newBarColors.push(gradHadirActiveRef);
+                                } else {
+                                    newBarColors.push(gradHadirDarkRef);
+                                }
+                                newBorderColors.push('transparent');
+                                newBorderWidths.push(0);
+                            } else {
+                                if (maxHadirVal === 0) {
+                                    newDisplayValues.push(emptyPlaceholderCadence[idx]);
+                                    newBarColors.push('#f1f5f9');
+                                    newBorderColors.push('#e2e8f0');
+                                    newBorderWidths.push(1);
+                                } else {
+                                    newDisplayValues.push(donezoStripedCadence[idx % 7]);
+                                    newBarColors.push(patternStripedRef);
+                                    newBorderColors.push('#cbd5e1');
+                                    newBorderWidths.push(1.5);
+                                }
+                            }
+                        }
+
+                        ringkasanBarChart.data.labels = realtimeDayLetters;
+                        ringkasanBarChart.data.datasets[0].data = newDisplayValues;
+                        ringkasanBarChart.data.datasets[0].backgroundColor = newBarColors;
+                        ringkasanBarChart.data.datasets[0].borderColor = newBorderColors;
+                        ringkasanBarChart.data.datasets[0].borderWidth = newBorderWidths;
+                        ringkasanBarChart.update();
+
+                        const barEmptyNote = document.getElementById('bar-empty-note');
+                        if (barEmptyNote) {
+                            if (maxHadirVal === 0) barEmptyNote.classList.remove('hidden');
+                            else barEmptyNote.classList.add('hidden');
+                        }
+                    }
+
+                    // 7. Update Rasio Kehadiran Hari Ini Semi-Circle Gauge Chart
+                    if (ringkasanPieChart) {
+                        realtimeGaugeHadir = parseInt(data.countHadir) || 0;
+                        realtimeGaugeLembur = parseInt(data.countLembur) || 0;
+                        realtimeGaugeIzin = parseInt(data.countIzin) || 0;
+                        realtimeGaugeAlpa = parseInt(data.countAlpa) || 0;
+                        realtimeGaugeTotalReal = realtimeGaugeHadir + realtimeGaugeLembur + realtimeGaugeIzin + realtimeGaugeAlpa;
+
+                        const isGaugeEmptyNow = (realtimeGaugeHadir === 0 && realtimeGaugeLembur === 0 && realtimeGaugeIzin === 0);
+                        const newGaugeData = realtimeGaugeTotalReal > 0 
+                            ? (isGaugeEmptyNow 
+                                ? [0, 0, 0, realtimeGaugeAlpa || 1] 
+                                : [realtimeGaugeHadir, realtimeGaugeLembur, realtimeGaugeIzin, Math.max(realtimeGaugeAlpa, 0)]) 
+                            : [0, 0, 0, 1];
+
+                        const newGaugeColors = isGaugeEmptyNow
+                            ? ['#e2e8f0', '#e2e8f0', '#e2e8f0', '#f1f5f9']
+                            : [gradCompletedRef, '#7c3aed', '#f59e0b', '#e2e8f0'];
+
+                        ringkasanPieChart.data.datasets[0].data = newGaugeData;
+                        ringkasanPieChart.data.datasets[0].backgroundColor = newGaugeColors;
+                        ringkasanPieChart.update();
+
+                        const gaugeEmptyNote = document.getElementById('gauge-empty-note');
+                        if (gaugeEmptyNote) {
+                            if (realtimeGaugeHadir === 0) {
+                                gaugeEmptyNote.innerHTML = '<i class="fas fa-clock text-amber-500 text-xs"></i><span>Menunggu data presensi masuk hari ini</span>';
+                            } else {
+                                gaugeEmptyNote.innerHTML = `<i class="fas fa-check-circle text-emerald-500 text-xs"></i><span>${realtimeGaugeHadir} dari ${realtimeGaugeTotalReal} karyawan telah presensi</span>`;
+                            }
+                        }
+                    }
+                };
+
+                let isRealtimeFetching = false;
+                window.fetchRealtimeStats = async function(isManual = false) {
+                    const ringkasanTab = document.getElementById('tab-ringkasan');
+                    const isRingkasanActive = ringkasanTab && !ringkasanTab.classList.contains('hidden');
+                    if (!isRingkasanActive && !isManual) return;
+                    if (isRealtimeFetching) return;
+
+                    const iconSync = document.getElementById('icon-manual-sync');
+                    if (isManual && iconSync) {
+                        iconSync.classList.add('fa-spin');
+                    }
+
+                    try {
+                        isRealtimeFetching = true;
+                        const dateInput = document.getElementById('filter_tanggal_admin');
+                        const tanggal = dateInput ? dateInput.value : '';
+                        const url = `/api/dashboard/realtime-stats${tanggal ? '?tanggal=' + encodeURIComponent(tanggal) : ''}`;
+
+                        const response = await fetch(url, {
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+
+                        if (!response.ok) return;
+
+                        const res = await response.json();
+                        const data = res && res.data ? res.data : res;
+                        if (data && (data.countHadir !== undefined || data.status === 'success' || res.success)) {
+                            window.updateDashboardRealtime(data);
+                        }
+                    } catch (err) {
+                        console.warn('Realtime fetch error:', err);
+                    } finally {
+                        isRealtimeFetching = false;
+                        if (isManual && iconSync) {
+                            setTimeout(() => { iconSync.classList.remove('fa-spin'); }, 500);
+                        }
+                    }
+                };
+
+                window.triggerManualRealtimeSync = function() {
+                    window.fetchRealtimeStats(true);
+                };
+
+                window.handleDateFilterChange = function(newDate) {
+                    window.fetchRealtimeStats(true);
+                };
+
+                // Auto Polling every 5 seconds
+                if (!window.realtimeDashboardInterval) {
+                    window.realtimeDashboardInterval = setInterval(() => {
+                        if (document.hidden) return;
+                        window.fetchRealtimeStats(false);
+                    }, 5000);
+                }
             }
 
             const btnNotif = document.getElementById("btnNotifikasi");

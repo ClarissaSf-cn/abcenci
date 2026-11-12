@@ -37,90 +37,94 @@
     @endforeach
 </datalist>
 
-<div class="glass-card flex-1 overflow-hidden flex flex-col border-t-4 border-emerald-500 shadow-md rounded-2xl">
-    <div class="px-4 sm:px-7 py-3.5 sm:py-5 border-b border-slate-100 bg-white flex flex-wrap justify-between items-center gap-3 sm:gap-4">
+<div class="glass-card rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col flex-1 min-h-0 bg-white">
+    <div class="px-5 sm:px-7 py-3.5 border-b border-slate-100 bg-white flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shrink-0">
         <div>
-            <h3 class="text-sm font-black text-slate-700 uppercase tracking-widest"><i class="fas fa-calendar-day text-emerald-500 mr-2"></i> Jadwal Karyawan Harian</h3>
-            <p class="text-[10px] font-bold text-slate-400 mt-0.5 sm:mt-1 uppercase tracking-wide">Pemetaan/plotting penugasan shift per individu (Hanya Berlaku Sehari)</p>
+            <div class="flex items-center gap-2.5">
+                <h3 class="text-base sm:text-lg font-bold text-slate-800 leading-tight">Jadwal Karyawan Harian</h3>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold shadow-sm">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                    <span>{{ isset($schedules) ? count($schedules) : 0 }}</span> Plotting
+                </span>
+            </div>
+            <p class="text-xs text-slate-400 font-medium mt-0.5">Pemetaan/plotting penugasan shift per individu (Hanya Berlaku Sehari)</p>
         </div>
 
         {{-- KUMPULAN TOMBOL AKSI --}}
-        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-            {{-- PERBAIKAN: target="_blank" DIHAPUS DI SINI --}}
-            <a href="{{ route('schedules.export-pdf', ['shift_filter' => request('shift_filter'), 'shift_group' => request('shift_group')]) }}" class="bg-red-500 text-white px-3 sm:px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-red-600 transition shadow flex items-center">
-                <i class="fas fa-file-pdf mr-1.5 sm:mr-2 text-sm"></i> PDF
+        <div class="flex items-center gap-2.5 flex-wrap sm:flex-nowrap shrink-0">
+            <a href="{{ route('schedules.export-pdf', ['shift_filter' => request('shift_filter'), 'shift_group' => request('shift_group')]) }}" class="px-3.5 rounded-xl text-white text-xs font-bold transition-all shadow-sm hover:opacity-90 active:scale-[0.98] flex items-center gap-1.5 cursor-pointer" style="background-color: #ef4444 !important; height: 38px;">
+                <i class="fas fa-file-pdf text-sm"></i>
+                <span>PDF</span>
             </a>
 
-            <a href="{{ route('schedules.export-excel') }}" class="bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-green-700 transition shadow flex items-center">
-                <i class="fas fa-file-excel mr-1.5 sm:mr-2 text-sm"></i> EXCEL
+            <a href="{{ route('schedules.export-excel') }}" class="px-3.5 rounded-xl text-white text-xs font-bold transition-all shadow-sm hover:opacity-90 active:scale-[0.98] flex items-center gap-1.5 cursor-pointer" style="background-color: #16a34a !important; height: 38px;">
+                <i class="fas fa-file-excel text-sm"></i>
+                <span>Excel</span>
             </a>
 
-            <button onclick="document.getElementById('modalAddSchedule').classList.remove('hidden')" class="bg-indofood-blue text-white px-3 sm:px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-blue-800 transition shadow flex items-center">
-                <i class="fas fa-calendar-plus mr-1.5 sm:mr-2 text-sm"></i> Plot Jadwal
+            <button onclick="document.getElementById('modalAddSchedule').classList.remove('hidden')" class="px-4 rounded-xl text-white text-xs font-bold transition-all shadow-sm hover:opacity-95 active:scale-[0.98] flex items-center gap-2 cursor-pointer shrink-0" style="background-color: #004a99 !important; height: 38px;">
+                <i class="fas fa-calendar-plus text-sm"></i>
+                <span>Plot Jadwal</span>
             </button>
         </div>
     </div>
 
     {{-- AREA FILTER PENCARIAN SPESIFIK & TOMBOL AKSI MASSAL --}}
-    <div class="px-4 sm:px-7 py-3 bg-slate-50 border-b border-slate-100 flex flex-wrap justify-between items-center gap-3 shrink-0">
+    <div class="px-5 sm:px-7 py-2.5 bg-slate-50 border-b border-slate-200/80 flex flex-wrap items-center justify-between gap-2.5 shrink-0">
 
-        {{-- Ringkasan singkat: tampilkan di bar filter (compact) di paling kiri --}}
-        <div class="flex items-center gap-4 text-sm text-slate-600 order-1 md:order-1">
-            <div class="flex items-center gap-2">
-                <span class="text-slate-500">Total</span>
-                <span class="font-black text-slate-800">{{ $totalEmployees }}</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="text-slate-500">Sudah terdaftar</span>
-                <span class="font-black text-emerald-700">{{ $registeredCount }}</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="text-slate-500">Belum terdaftar</span>
-                <span class="font-black text-amber-700">{{ $unregisteredCount }}</span>
-            </div>
+        {{-- Ringkasan singkat --}}
+        <div class="flex items-center gap-2 text-xs font-medium text-slate-600 order-1 md:order-1">
+            <span class="px-2.5 py-1 rounded-xl bg-white border border-slate-200 text-slate-700 shadow-xs">Total: <strong class="font-bold text-slate-800">{{ $totalEmployees }}</strong></span>
+            <span class="px-2.5 py-1 rounded-xl bg-white border border-emerald-200 text-emerald-700 shadow-xs">Terdaftar: <strong class="font-bold text-emerald-700">{{ $registeredCount }}</strong></span>
+            <span class="px-2.5 py-1 rounded-xl bg-white border border-amber-200 text-amber-700 shadow-xs">Belum: <strong class="font-bold text-amber-700">{{ $unregisteredCount }}</strong></span>
         </div>
 
-        <div class="flex items-center gap-2 h-9 order-2 md:order-2">
-            {{-- Tombol ini otomatis muncul jika ada checkbox yang dicentang --}}
-            <button onclick="prosesJadwalTerpilih()" id="btnBulkActionJadwal" class="hidden bg-slate-700 text-white px-4 py-2 rounded-lg text-[9px] font-bold uppercase tracking-widest hover:bg-slate-800 transition shadow-sm flex items-center">
-                <i class="fas fa-tasks mr-2"></i> Proses Terpilih (<span id="countSelectedJadwal">0</span>)
+        <div class="flex items-center gap-2 order-2 md:order-2">
+            <button onclick="prosesJadwalTerpilih()" id="btnBulkActionJadwal" class="hidden bg-slate-700 text-white px-3.5 rounded-xl text-xs font-bold hover:bg-slate-800 transition shadow-sm items-center gap-1.5" style="height: 38px;">
+                <i class="fas fa-tasks text-xs"></i> <span>Proses Terpilih (<span id="countSelectedJadwal">0</span>)</span>
             </button>
         </div>
 
-        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto order-3 md:order-3">
+        <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto order-3 md:order-3">
             {{-- FILTER BARU: Jenis Jadwal --}}
-            <select id="filterJenisJadwal" onchange="filterSchedules()" class="text-[11px] font-semibold text-slate-600 border border-slate-200 rounded-xl px-3 py-2 bg-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none shadow-sm cursor-pointer">
-                <option value="">Semua Jenis Jadwal</option>
-                <option value="reguler">Reguler</option>
-                <option value="jadwal khusus">Jadwal Khusus</option>
-                <option value="tidak normal">Tidak Normal</option>
-                <option value="per tanggal">Per Tanggal</option>
-            </select>
+            <div class="relative flex items-center shrink-0">
+                <select id="filterJenisJadwal" onchange="filterSchedules()" class="text-xs font-semibold text-slate-700 border border-slate-300 rounded-xl pl-3.5 pr-8 bg-white focus:outline-none focus:border-emerald-500 shadow-sm cursor-pointer appearance-none transition-all" style="height: 38px;">
+                    <option value="">Semua Jenis Jadwal</option>
+                    <option value="reguler">Reguler</option>
+                    <option value="jadwal khusus">Jadwal Khusus</option>
+                    <option value="tidak normal">Tidak Normal</option>
+                    <option value="per tanggal">Per Tanggal</option>
+                </select>
+                <i class="fas fa-chevron-down text-slate-400 text-[9px] absolute right-3 pointer-events-none"></i>
+            </div>
 
             {{-- Filter Spesifik: Shift Aktif --}}
-            <select id="filterShiftCode" onchange="filterSchedules()" class="text-[11px] font-semibold text-slate-600 border border-slate-200 rounded-xl px-3 py-2 bg-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none shadow-sm cursor-pointer">
-                <option value="">Semua Shift</option>
-                @foreach($uniqueShifts as $code)
-                    <option value="{{ $code }}">{{ $code }}</option>
-                @endforeach
-            </select>
+            <div class="relative flex items-center shrink-0">
+                <select id="filterShiftCode" onchange="filterSchedules()" class="text-xs font-semibold text-slate-700 border border-slate-300 rounded-xl pl-3.5 pr-8 bg-white focus:outline-none focus:border-emerald-500 shadow-sm cursor-pointer appearance-none transition-all" style="height: 38px;">
+                    <option value="">Semua Shift</option>
+                    @foreach($uniqueShifts as $code)
+                        <option value="{{ $code }}">{{ $code }}</option>
+                    @endforeach
+                </select>
+                <i class="fas fa-chevron-down text-slate-400 text-[9px] absolute right-3 pointer-events-none"></i>
+            </div>
 
             {{-- Filter Global (Cari Teks) --}}
-            <div class="relative w-64">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+            <div class="relative flex items-center w-64 sm:w-72">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
                     <i class="fas fa-search text-xs"></i>
                 </span>
-                <input type="text" id="searchSchedule" onkeyup="filterSchedules()" placeholder="Cari NIK, Nama, atau Tanggal..." class="w-full pl-9 pr-4 py-2 text-[11px] font-semibold text-slate-700 border border-slate-200 rounded-xl focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-shadow shadow-sm bg-white placeholder-slate-400">
+                <input type="text" id="searchSchedule" onkeyup="filterSchedules()" placeholder="Cari NIK, Nama, atau Tanggal..." class="w-full pl-9 pr-3.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500 shadow-sm transition-all" style="height: 38px;">
             </div>
         </div>
     </div>
 
     <div class="overflow-x-auto p-5 bg-slate-50 flex-1">
-        <table class="w-full text-left border-collapse table-bordered whitespace-nowrap bg-white shadow-sm rounded-xl overflow-hidden" id="scheduleTable">
-            <thead class="bg-slate-100 text-slate-600 text-[9px] uppercase tracking-wider font-black border-b-2 border-slate-200 sticky top-0 z-10">
+        <table class="w-full text-left border-collapse whitespace-nowrap bg-white shadow-sm rounded-xl overflow-hidden" id="scheduleTable">
+            <thead class="sticky top-0 z-10 shadow-xs">
                 <tr>
                     {{-- KOLOM CHECKBOX SELECT ALL --}}
-                    <th class="p-3 text-center w-10">
+                    <th class="p-3.5 text-center w-10">
                         <input type="checkbox" id="checkAllSchedules" onclick="toggleAllSchedules(this)" class="w-3.5 h-3.5 text-emerald-500 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer">
                     </th>
                     <th class="p-3.5 text-center">No</th>
@@ -132,16 +136,16 @@
                     <th class="p-3.5">Catatan Khusus</th>
 
                     {{-- 3 KOLOM SHIFT & JAM --}}
-                    <th class="p-3.5 text-center bg-sky-50 border-l border-white">Shift Aktif 1</th>
-                    <th class="p-3.5 text-center bg-sky-50">Jam Shift 1</th>
-                    <th class="p-3.5 text-center bg-amber-50 border-l border-white">Shift Aktif 2</th>
-                    <th class="p-3.5 text-center bg-amber-50">Jam Shift 2</th>
-                    <th class="p-3.5 text-center bg-violet-100 border-l border-white">Shift Aktif 3</th>
-                    <th class="p-3.5 text-center bg-violet-100">Jam Shift 3</th>
+                    <th class="p-3.5 text-center bg-sky-50/50">Shift Aktif 1</th>
+                    <th class="p-3.5 text-center bg-sky-50/50">Jam Shift 1</th>
+                    <th class="p-3.5 text-center bg-amber-50/50">Shift Aktif 2</th>
+                    <th class="p-3.5 text-center bg-amber-50/50">Jam Shift 2</th>
+                    <th class="p-3.5 text-center bg-violet-50/50">Shift Aktif 3</th>
+                    <th class="p-3.5 text-center bg-violet-50/50">Jam Shift 3</th>
                     <th class="p-3.5 text-center">Aksi</th>
                 </tr>
             </thead>
-            <tbody class="text-[11px]">
+            <tbody class="divide-y divide-slate-100 text-slate-700 bg-white text-xs">
                 @forelse($schedules as $index => $schedule)
                 @php
                     $shift1 = $schedule->shift1 ?? null;
@@ -155,66 +159,84 @@
                     $searchString = strtolower(\Carbon\Carbon::parse($schedule->schedule_date)->format('d/m/y') . ' ' . ($schedule->hari_kerja ?? '') . ' ' . $schedule->nik . ' ' . ($schedule->employee?->nama ?? $schedule->karyawan?->nama ?? '') . ' ' . ($schedule->schedule_type ?? '') . ' ' . ($schedule->special_note ?? '') . ' ' . ($shift1->wst_code ?? '') . ' ' . ($shift2->wst_code ?? '') . ' ' . ($shift3->wst_code ?? ''));
                 @endphp
 
-                <tr class="text-slate-700 hover:bg-emerald-50/50 transition border-b border-slate-100 schedule-row"
+                <tr class="hover:bg-emerald-50/50 transition-colors border-b border-slate-100 schedule-row"
                     data-search="{{ $searchString }}"
                     data-jenis="{{ strtolower($schedule->schedule_type ?? 'reguler') }}">
 
                     {{-- CHECKBOX INDIVIDU --}}
-                    <td class="p-3 text-center">
+                    <td class="p-3.5 text-center">
                         <input type="checkbox" class="schedule-checkbox w-3.5 h-3.5 text-emerald-500 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer" value="{{ $schedule->id }}" onchange="updateBulkActionBtnSchedules()">
                     </td>
 
-                    <td class="p-3.5 text-center schedule-no">{{ $index + 1 }}</td>
-                    <td class="p-3.5 text-center text-slate-500">{{ \Carbon\Carbon::parse($schedule->schedule_date)->format('d/m/Y') }}</td>
-                    <td class="p-3.5 text-center font-bold text-slate-700">{{ $schedule->hari_kerja ?? '-' }}</td>
-                    <td class="p-3.5 text-center"><span class="text-blue-700 underline">{{ $schedule->nik }}</span></td>
-                    <td class="p-3.5 text-slate-800 uppercase">{{ $schedule->employee?->nama ?? $schedule->karyawan?->nama ?? $schedule->user?->name ?? '-' }}</td>
-                    <td class="p-3.5 text-slate-800 font-bold uppercase">{{ $schedule->schedule_type ?? 'Reguler' }}</td>
-                    <td class="p-3.5 text-slate-600">{{ $schedule->special_note ?? '-' }}</td>
+                    <td class="p-3.5 text-center">
+                        <span class="text-xs font-semibold text-slate-400 schedule-no">{{ $index + 1 }}</span>
+                    </td>
+                    <td class="p-3.5 text-center">
+                        <span class="text-xs font-medium text-slate-600 font-mono">{{ \Carbon\Carbon::parse($schedule->schedule_date)->format('d/m/Y') }}</span>
+                    </td>
+                    <td class="p-3.5 text-center">
+                        <span class="text-xs font-bold text-slate-700">{{ $schedule->hari_kerja ?? '-' }}</span>
+                    </td>
+                    <td class="p-3.5 text-center">
+                        <span class="inline-block px-2.5 py-0.5 rounded-lg bg-blue-50/90 text-blue-700 border border-blue-100 font-bold text-xs font-mono tracking-wide">{{ $schedule->nik }}</span>
+                    </td>
+                    <td class="p-3.5">
+                        <span class="text-xs font-medium text-slate-800 uppercase">{{ $schedule->employee?->nama ?? $schedule->karyawan?->nama ?? $schedule->user?->name ?? '-' }}</span>
+                    </td>
+                    <td class="p-3.5">
+                        <span class="text-xs font-semibold text-slate-700">{{ ucfirst($schedule->schedule_type ?? 'Reguler') }}</span>
+                    </td>
+                    <td class="p-3.5">
+                        <span class="text-xs font-medium text-slate-500">{{ $schedule->special_note ?? '-' }}</span>
+                    </td>
 
                     {{-- KOLOM SHIFT 1 --}}
-                    <td class="p-3.5 text-center bg-sky-50/30 border-l border-white">
+                    <td class="p-3.5 text-center bg-sky-50/30">
                         @if($shift1)
-                            <span class="bg-sky-100 text-sky-700 px-3 py-1 rounded border border-sky-200 font-bold">{{ $shift1->wst_code }}</span>
+                            <span class="inline-block px-2.5 py-0.5 rounded-lg bg-sky-50 text-sky-700 border border-sky-200 font-bold text-xs font-mono">{{ $shift1->wst_code }}</span>
                         @else
-                            -
+                            <span class="text-xs text-slate-400">-</span>
                         @endif
                     </td>
-                    <td class="p-3.5 text-center bg-sky-50/30 font-semibold text-sky-700">{{ $jam1 }}</td>
+                    <td class="p-3.5 text-center bg-sky-50/30">
+                        <span class="text-xs font-semibold text-sky-700 font-mono">{{ $jam1 }}</span>
+                    </td>
 
                     {{-- KOLOM SHIFT 2 --}}
-                    <td class="p-3.5 text-center bg-amber-50/30 border-l border-white">
+                    <td class="p-3.5 text-center bg-amber-50/30">
                         @if($shift2)
-                            <span class="bg-amber-100 text-amber-700 px-3 py-1 rounded border border-amber-200 font-bold">{{ $shift2->wst_code }}</span>
+                            <span class="inline-block px-2.5 py-0.5 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 font-bold text-xs font-mono">{{ $shift2->wst_code }}</span>
                         @else
-                            -
+                            <span class="text-xs text-slate-400">-</span>
                         @endif
                     </td>
-                    <td class="p-3.5 text-center bg-amber-50/30 font-semibold text-amber-700">{{ $jam2 }}</td>
+                    <td class="p-3.5 text-center bg-amber-50/30">
+                        <span class="text-xs font-semibold text-amber-700 font-mono">{{ $jam2 }}</span>
+                    </td>
 
                     {{-- KOLOM SHIFT 3 --}}
-                    <td class="p-3.5 text-center bg-violet-50/30 border-l border-white">
+                    <td class="p-3.5 text-center bg-violet-50/30">
                         @if($shift3)
-                            <span class="bg-violet-100 text-violet-700 px-3 py-1 rounded border border-violet-300 font-bold">{{ $shift3->wst_code }}</span>
+                            <span class="inline-block px-2.5 py-0.5 rounded-lg bg-violet-50 text-violet-700 border border-violet-200 font-bold text-xs font-mono">{{ $shift3->wst_code }}</span>
                         @else
-                            -
+                            <span class="text-xs text-slate-400">-</span>
                         @endif
                     </td>
-                    <td class="p-3.5 text-center bg-violet-50/30 font-semibold text-violet-700">{{ $jam3 }}</td>
+                    <td class="p-3.5 text-center bg-violet-50/30">
+                        <span class="text-xs font-semibold text-violet-700 font-mono">{{ $jam3 }}</span>
+                    </td>
 
-                    {{-- TOMBOL AKSI CRUD (warna disamakan dengan rekap absensi) --}}
-                    <td class="p-3 text-center border-l border-white">
-                        <div class="flex justify-center gap-3">
-                            {{-- EDIT: warna biru seperti rekap absensi --}}
-                            <button type="button" data-schedule="{{ base64_encode(json_encode($schedule)) }}" onclick="openEditScheduleModal(this)" class="text-blue-500 hover:text-blue-700 hover:scale-110 transition-transform" title="Edit Jadwal">
-                                <i class="fas fa-edit"></i>
+                    {{-- TOMBOL AKSI CRUD --}}
+                    <td class="p-3.5 text-center">
+                        <div class="flex justify-center items-center gap-2.5">
+                            <button type="button" data-schedule="{{ base64_encode(json_encode($schedule)) }}" onclick="openEditScheduleModal(this)" class="w-8 h-8 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors flex items-center justify-center cursor-pointer" title="Edit Jadwal">
+                                <i class="fas fa-edit text-xs"></i>
                             </button>
-                            {{-- HAPUS: warna merah seperti rekap absensi --}}
                             <form action="{{ route('schedules.destroy', $schedule->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus plotting jadwal ini?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-red-400 hover:text-red-600 transition-transform hover:scale-110" title="Hapus Jadwal">
-                                    <i class="fas fa-trash-alt"></i>
+                                <button type="submit" class="w-8 h-8 rounded-lg text-rose-500 hover:bg-rose-50 transition-colors flex items-center justify-center cursor-pointer" title="Hapus Jadwal">
+                                    <i class="fas fa-trash-alt text-xs"></i>
                                 </button>
                             </form>
                         </div>
@@ -636,3 +658,42 @@
         }
     }
 </script>
+
+<style>
+    /* Styling Tabel Jadwal Karyawan Modern & Presisi */
+    #scheduleTable {
+        border-collapse: separate !important;
+        border-spacing: 0 !important;
+    }
+    #scheduleTable thead th {
+        background-color: #f8fafc !important;
+        color: #475569 !important;
+        font-weight: 700 !important;
+        font-size: 11px !important;
+        letter-spacing: 0.04em !important;
+        text-transform: uppercase !important;
+        border-top: none !important;
+        border-bottom: 1.5px solid #e2e8f0 !important;
+        border-right: 1px solid #f1f5f9 !important;
+        border-left: none !important;
+        padding: 0.85rem 1rem !important;
+        white-space: nowrap !important;
+    }
+    #scheduleTable tbody td {
+        border-bottom: 1px solid #f1f5f9 !important;
+        border-right: 1px solid #f1f5f9 !important;
+        border-top: none !important;
+        border-left: none !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 12px !important;
+        color: #334155 !important;
+        vertical-align: middle !important;
+        background-color: #ffffff;
+    }
+    #scheduleTable tbody tr:nth-child(even) td {
+        background-color: #fafbfc;
+    }
+    #scheduleTable tbody tr:hover td {
+        background-color: #f0f7ff !important;
+    }
+</style>

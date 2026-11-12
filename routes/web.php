@@ -14,6 +14,7 @@ use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\EmployeeScheduleController;
 use App\Http\Controllers\ClosingPeriodeController;
 use App\Http\Controllers\PenilaianController;
+use App\Http\Controllers\AttendanceLocationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -25,6 +26,7 @@ Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallb
 
 Route::get('/api/karyawan/{nik}', [KioskController::class, 'getKaryawanByNik'])->name('api.karyawan.nik');
 Route::get('/api/karyawan-all', [KioskController::class, 'getAllKaryawan'])->name('api.karyawan.all');
+Route::get('/api/attendance-locations', [AttendanceLocationController::class, 'getActiveLocations'])->name('api.attendance-locations');
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
@@ -36,6 +38,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('refresh.csrf');
 
     Route::get('/dashboard', [AttendanceController::class, 'index'])->name('dashboard');
+    Route::get('/api/dashboard/realtime-stats', [AttendanceController::class, 'getRealtimeStats'])->name('dashboard.realtime.stats');
 
     Route::get('/dashboard-karyawan', [AttendanceController::class, 'dashboardKaryawan'])->name('dashboard.karyawan');
 
@@ -56,6 +59,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/export', [AttendanceController::class, 'exportExcel'])->name('attendance.export');
         Route::put('/{id}', [AttendanceController::class, 'update'])->name('attendance.update');
         Route::delete('/{id}', [AttendanceController::class, 'destroy'])->name('attendance.destroy');
+    });
+
+    Route::prefix('attendance-locations')->group(function () {
+        Route::post('/store', [AttendanceLocationController::class, 'store'])->name('attendance-locations.store');
+        Route::put('/{id}', [AttendanceLocationController::class, 'update'])->name('attendance-locations.update');
+        Route::put('/{id}/toggle', [AttendanceLocationController::class, 'toggleStatus'])->name('attendance-locations.toggle');
+        Route::delete('/{id}', [AttendanceLocationController::class, 'destroy'])->name('attendance-locations.destroy');
     });
 
     Route::prefix('lembur')->group(function () {

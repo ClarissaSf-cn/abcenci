@@ -26,3 +26,5 @@ Thumbs.db
 ngrok.exe
 *.exe
 composer-setup.php
+.neon
+.env.local
