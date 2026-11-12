@@ -642,7 +642,7 @@
                         <div id="tab-jadwal-karyawan" class="tab-content hidden flex-1 flex-col gap-6">
                             @include('dashboard.jadwal_karyawan')
                         </div>
-                        @include('Dashboard.input_lembur')
+                        @include('dashboard.input_lembur')
 
                     @endif
 
@@ -785,7 +785,7 @@
                     {{-- TAB CLOSING PERIODE (STATIONERY) --}}
                     @if($isSuperAdmin || $isAdminStationery)
                         <div id="tab-closing-stationery" class="tab-content hidden flex-1 flex-col gap-6 min-h-0">
-                            @include('Dashboard.closing_periode')
+                            @include('dashboard.closing_periode')
                         </div>
                     @endif
 
@@ -961,12 +961,12 @@
 
                     @if($isSuperAdmin)
                         @include('dashboard.users')
-                        @include('Dashboard.lokasi_absen')
+                        @include('dashboard.lokasi_absen')
                     @endif
 
                     @if($isSuperAdmin || $isAdminAbsensi || $isAdminPenilaian)
-                        @include('Dashboard.aspek_penilaian')
-                        @include('Dashboard.laporan_penilaian')
+                        @include('dashboard.aspek_penilaian')
+                        @include('dashboard.laporan_penilaian')
                     @endif
 
                     <div class="mt-auto pt-6 pb-2 text-center shrink-0 print-hide">

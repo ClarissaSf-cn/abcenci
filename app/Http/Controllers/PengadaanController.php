@@ -20,8 +20,8 @@ class PengadaanController extends Controller
         // Mengambil data master barang untuk pilihan di dropdown form tambah data
         $barangs = Stationery::all();
 
-        // Mengarahkan ke file resources/views/Dashboard/pengadaan.blade.php
-        return view('Dashboard.pengadaan', compact('pengadaans', 'barangs'));
+        // Mengarahkan ke file resources/views/dashboard/pengadaan.blade.php
+        return view('dashboard.pengadaan', compact('pengadaans', 'barangs'));
     }
 
     // Menyimpan data PR/PO baru ke database

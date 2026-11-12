@@ -151,7 +151,7 @@ class AttendanceController extends Controller
         $riwayat_closing = \App\Models\ClosingPeriode::orderBy('created_at', 'desc')->get();
         $attendance_locations = \App\Models\AttendanceLocation::orderBy('id', 'asc')->get();
 
-        return view('Dashboard.dashboard', compact(
+        return view('dashboard.dashboard', compact(
             'attendance', 'tim_assorting', 'rekap_semua', 'employees', 'master_karyawan',
             'chartLabels', 'chartValues', 'trendLabels', 'trendHadir',
             'trendLembur', 'trendIzin', 'trendTanpaKet', 'filterDate',

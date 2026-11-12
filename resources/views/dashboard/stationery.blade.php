@@ -1069,7 +1069,7 @@
 @include('dashboard.modals')
 
 {{-- Include Modal Edit Pemakaian --}}
-@include('Dashboard.modalEditPemakaian')
+@include('dashboard.modalEditPemakaian')
 
 {{-- MODAL BARANG MASUK GABUNGAN DENGAN GRID SEMPURNA AGAR TIDAK MOTONG --}}
 <div id="modalBarangMasukGabungan" class="fixed inset-0 z-50 hidden bg-gray-900/60 backdrop-blur-sm flex items-center justify-center transition-all duration-300">

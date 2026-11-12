@@ -45,7 +45,7 @@ class SplController extends Controller
             ->sort()
             ->values();
 
-        return view('Dashboard.rekap_spl', compact('spls', 'departments'));
+        return view('dashboard.rekap_spl', compact('spls', 'departments'));
     }
 
     public function show(Spl $spl)
