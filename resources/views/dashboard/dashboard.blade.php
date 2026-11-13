@@ -369,10 +369,14 @@
         <div class="flex-1 flex flex-col min-w-0 relative h-screen">
 
             <header class="bg-white/90 backdrop-blur-md px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 flex justify-between items-center z-20 shadow-2xs shrink-0 h-16 sm:h-[72px] print-hide">
-                <div class="flex items-center gap-4">
-                    <button onclick="toggleSidebar()" class="text-slate-500 hover:text-indofood-blue focus:outline-none transition-colors p-2.5 rounded-xl hover:bg-slate-100 flex items-center justify-center cursor-pointer">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()" class="text-slate-500 hover:text-indofood-blue focus:outline-none transition-colors p-2.5 rounded-xl hover:bg-slate-100 flex items-center justify-center cursor-pointer" title="Toggle Sidebar">
                         <i class="fas fa-bars text-lg"></i>
                     </button>
+                    <div class="h-5 w-px bg-slate-200 hidden sm:block"></div>
+                    <h2 id="header-title" class="text-sm sm:text-base font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
+                        Dashboard / Overview
+                    </h2>
                 </div>
 
                 <div class="flex items-center gap-2 sm:gap-4">
@@ -663,300 +667,14 @@
                         @include('dashboard.lembur')
                     @endif
 
+                    {{-- MODUL STATIONERY --}}
                     @if($isSuperAdmin || $isAdminStationery)
+                        @include('dashboard.stationery')
 
-                    <div id="tab-analitik-stationery" class="tab-content hidden flex-1 flex-col gap-6">
-                        <div class="grid grid-cols-2 lg:grid-cols-5 gap-5 shrink-0">
-                            <div id="stat-card-1" class="glass-card p-5 border-l-4 border-blue-500 bg-blue-50/30">
-                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Jenis Barang</p>
-                                <h3 class="text-2xl font-extrabold text-slate-700 mt-1" id="stat-total-barang">0</h3>
-                            </div>
-                            <div id="stat-card-2" class="glass-card p-5 border-l-4 border-indigo-500 bg-indigo-50/30">
-                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Barang Masuk</p>
-                                <h3 class="text-2xl font-extrabold text-indigo-600 mt-1" id="stat-total-in">0</h3>
-                            </div>
-                            <div id="stat-card-3" class="glass-card p-5 border-l-4 border-red-500 bg-red-50/30">
-                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Barang Keluar</p>
-                                <h3 class="text-2xl font-extrabold text-red-600 mt-1" id="stat-total-out">0</h3>
-                            </div>
-                            <div id="stat-card-4" class="glass-card p-5 border-l-4 border-green-500 bg-green-50/30">
-                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest" id="title-aset">Nilai Aset Stok</p>
-                                <h3 class="text-2xl font-extrabold text-green-600 mt-1 truncate" id="stat-total-aset">Rp 0</h3>
-                            </div>
-                            <div id="stat-card-5" class="glass-card p-5 border-l-4 border-yellow-500 bg-yellow-50/50 shadow-sm">
-                                <p class="text-[10px] font-black text-yellow-600 uppercase tracking-widest">Stok Habis (0)</p>
-                                <h3 class="text-2xl font-extrabold text-yellow-600 mt-1" id="stat-stok-habis">0</h3>
-                            </div>
-                        </div>
-
-                        <div id="chart-card" class="glass-card p-7 flex-1 flex flex-col mt-2 h-auto pb-10">
-                            <div class="flex flex-wrap justify-between items-center mb-6 gap-4 border-b border-slate-100 pb-5">
-                                <div>
-                                    <h3 class="text-sm font-black text-slate-700 uppercase tracking-widest"><i class="fas fa-chart-pie text-indofood-blue mr-2"></i>Dashboard Analitik Top 5</h3>
-                                    <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Visualisasi Top 5 Kuantitas & Frekuensi</p>
-                                </div>
-
-                                <div class="flex flex-wrap items-center gap-3 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                                    <div class="flex flex-col">
-                                        <label class="text-[9px] font-black text-slate-400 uppercase mb-1">Filter Hari</label>
-                                        <input type="date" id="chartFilterHari" onchange="updateStationeryChart('hari')" class="form-input-modern text-xs py-2 px-3.5 w-36 shadow-sm cursor-pointer">
-                                    </div>
-
-                                    <div class="flex flex-col">
-                                        <label class="text-[9px] font-black text-slate-400 uppercase mb-1">Filter Bulan</label>
-                                        <select id="chartFilterBulan" onchange="updateStationeryChart('bulan')" class="form-input-modern text-xs py-2 px-3.5 w-36 shadow-sm cursor-pointer">
-                                            <option value="">Semua Bulan</option>
-                                            <option value="01">Januari</option>
-                                            <option value="02">Februari</option>
-                                            <option value="03">Maret</option>
-                                            <option value="04">April</option>
-                                            <option value="05">Mei</option>
-                                            <option value="06">Juni</option>
-                                            <option value="07">Juli</option>
-                                            <option value="08">Agustus</option>
-                                            <option value="09">September</option>
-                                            <option value="10">Oktober</option>
-                                            <option value="11">November</option>
-                                            <option value="12">Desember</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="flex flex-col">
-                                        <label class="text-[9px] font-black text-slate-400 uppercase mb-1">Filter Barang</label>
-                                        <select id="chartFilterBarang" onchange="updateStationeryChart('barang')" class="form-input-modern text-xs py-2 px-3.5 w-56 shadow-sm cursor-pointer">
-                                            <option value="">Semua Barang (Top 5)</option>
-                                            @foreach(\App\Models\Stationery::orderBy('nama_barang')->get() as $item)
-                                                <option value="{{ $item->id }}">{{ $item->kode }} - {{ $item->nama_barang }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    <div class="flex flex-col justify-end h-full">
-                                        <button onclick="downloadChart()" class="bg-blue-600 text-white px-5 py-2.5 mt-[15px] rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-blue-700 transition shadow-md flex items-center">
-                                            <i class="fas fa-download mr-2"></i> PNG
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 w-full shrink-0 mt-2">
-                                <div id="boxChartKuantitas" class="w-full bg-white rounded-3xl border border-blue-100 shadow-md p-6 flex flex-col transition-all duration-300">
-                                    <h4 class="text-sm font-extrabold text-blue-700 uppercase tracking-widest mb-4 border-b-2 border-blue-50 pb-3 text-center">
-                                        1. Grafik Kuantitas (Quantity)
-                                    </h4>
-                                    <div id="wrapperQty" class="relative w-full flex items-center justify-center" style="height: 380px;">
-                                        <canvas id="stationeryOutChart" class="w-full h-full"></canvas>
-                                    </div>
-                                </div>
-
-                                <div id="boxChartFrekuensi" class="w-full bg-white rounded-3xl border border-indigo-100 shadow-md p-6 flex flex-col transition-all duration-300">
-                                    <h4 class="text-sm font-extrabold text-indigo-700 uppercase tracking-widest mb-4 border-b-2 border-indigo-50 pb-3 text-center">
-                                        2. Grafik Frekuensi (Frequency)
-                                    </h4>
-                                    <div id="wrapperFreq" class="relative w-full flex items-center justify-center" style="height: 380px;">
-                                        <canvas id="stationeryFreqChart" class="w-full h-full"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 w-full shrink-0 mt-8 pt-6 border-t border-slate-200">
-                                <div class="bg-white rounded-3xl shadow-sm p-6 border border-slate-100">
-                                    <h4 class="text-xs font-extrabold text-blue-700 uppercase tracking-widest mb-4 flex items-center">
-                                        <i class="fas fa-trophy mr-2 text-yellow-500 text-base"></i> Rincian Kuantitas (Top 5)
-                                    </h4>
-                                    <ul id="listTopKuantitas" class="space-y-2">
-                                        </ul>
-                                </div>
-
-                                <div class="bg-white rounded-3xl shadow-sm p-6 border border-slate-100">
-                                    <h4 class="text-xs font-extrabold text-indigo-700 uppercase tracking-widest mb-4 flex items-center">
-                                        <i class="fas fa-medal mr-2 text-yellow-500 text-base"></i> Rincian Frekuensi (Top 5)
-                                    </h4>
-                                    <ul id="listTopFrekuensi" class="space-y-2">
-                                        </ul>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    @include('dashboard.stationery')
-
-                    {{-- TAB CLOSING PERIODE (STATIONERY) --}}
-                    @if($isSuperAdmin || $isAdminStationery)
+                        {{-- TAB CLOSING PERIODE (STATIONERY) --}}
                         <div id="tab-closing-stationery" class="tab-content hidden flex-1 flex-col gap-6 min-h-0">
                             @include('dashboard.closing_periode')
                         </div>
-                    @endif
-
-                    {{-- TAB TRANSAKSI BARANG (IN/OUT) --}}
-                    <div id="tab-transaksi-stationery" class="tab-content hidden flex-1 flex-col gap-6">
-                        <div id="trx-header" class="flex flex-wrap justify-between items-center glass-card p-6 gap-4 shrink-0">
-                            <div>
-                                <h3 class="text-sm font-black text-slate-600 uppercase tracking-widest">Riwayat Transaksi Barang</h3>
-                                <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Pusat pencatatan barang masuk ke gudang dan pemakaian keluar</p>
-                            </div>
-                            <div class="flex gap-3">
-                                <button onclick="document.getElementById('modalBarangMasuk').classList.remove('hidden')" class="bg-green-600 text-white px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-green-700 shadow-md transition">
-                                    <i class="fas fa-box mr-2"></i> Catat Restock (Masuk)
-                                </button>
-                                <button onclick="document.getElementById('modalBarangKeluar').classList.remove('hidden')" class="bg-red-500 text-white px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-red-600 shadow-md transition">
-                                    <i class="fas fa-box-open mr-2"></i> Catat Pemakaian (Keluar)
-                                </button>
-                            </div>
-                        </div>
-
-                        <div id="trx-table-card" class="glass-card flex-1 overflow-hidden flex flex-col p-6">
-                            @php
-                                $transaksis = \App\Models\StationeryTransaction::with('stationery')->orderBy('created_at', 'desc')->get();
-                            @endphp
-                            <div class="overflow-y-auto">
-                                <table class="w-full text-left border-collapse table-bordered whitespace-nowrap rounded-lg overflow-hidden">
-                                    <thead class="bg-slate-100 text-slate-600 text-[10px] uppercase tracking-wider sticky top-0">
-                                        <tr>
-                                            <th class="p-3.5 text-center w-12">No</th>
-                                            <th class="p-3.5 text-center">Tgl Input</th>
-                                            <th class="p-3.5 text-center">Jenis</th>
-                                            <th class="p-3.5">Kode & Nama Barang</th>
-                                            <th class="p-3.5 text-center">Jumlah</th>
-                                            <th class="p-3.5">Detail (Dept/Vendor/Ket)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($transaksis as $index => $trx)
-                                        <tr class="text-xs font-bold text-slate-700 border-b">
-                                            <td class="p-3.5 text-center">{{ $index + 1 }}</td>
-                                            <td class="p-3.5 text-center">{{ \Carbon\Carbon::parse($trx->tanggal)->format('d/m/Y') }}</td>
-                                            <td class="p-3.5 text-center">
-                                                @if($trx->type == 'masuk')
-                                                    <span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full text-[9px] uppercase font-black shadow-sm border border-emerald-200"><i class="fas fa-arrow-down mr-1"></i> Masuk</span>
-                                                @else
-                                                    <span class="bg-rose-100 text-rose-700 px-2.5 py-1 rounded-full text-[9px] uppercase font-black shadow-sm border border-rose-200"><i class="fas fa-arrow-up mr-1"></i> Keluar</span>
-                                                @endif
-                                            </td>
-                                            <td class="p-3.5"><span class="text-blue-600">{{ $trx->stationery->kode ?? 'N/A' }}</span> - {{ $trx->stationery->nama_barang ?? 'Barang Dihapus' }}</td>
-                                            <td class="p-3.5 text-center text-sm font-black {{ $trx->type == 'masuk' ? 'text-emerald-600' : 'text-rose-600' }}">{{ $trx->jumlah }}</td>
-                                            <td class="p-3.5 text-[10px] text-slate-500 whitespace-normal min-w-[200px]">
-                                                @if($trx->type == 'masuk')
-                                                    Vendor: <span class="font-bold">{{ $trx->vendor ?? '-' }}</span> | Dok: {{ $trx->no_dokumen ?? '-' }}
-                                                @else
-                                                    Dept: <span class="font-bold">{{ $trx->dept ?? '-' }}</span> | FPB: {{ $trx->no_fpb ?? '-' }} | Ket: {{ $trx->keterangan ?? '-' }}
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        @empty
-                                        <tr><td colspan="6" class="p-8 text-center text-slate-400 italic text-sm bg-white">Belum ada riwayat transaksi.</td></tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- TAB LAPORAN BARANG --}}
-                    <div id="tab-laporan-stationery" class="tab-content hidden flex-1 flex-col gap-6">
-
-                        {{-- MODUL 1: ORDER BARANG --}}
-                        <div class="glass-card flex-1 overflow-hidden flex flex-col border-t-4 border-blue-600 mb-6 shadow-md rounded-2xl">
-                            <div class="px-7 py-5 border-b border-slate-100 bg-white flex flex-wrap justify-between items-center gap-4">
-                                <div>
-                                    <h3 class="text-sm font-black text-blue-800 uppercase tracking-widest">1️⃣ Order Barang (Barang Masuk)</h3>
-                                    <p class="text-[10px] font-bold text-slate-500 mt-1 tracking-wide">Tabel pantauan stok dan rencana reorder barang</p>
-                                </div>
-                                <a href="{{ route('stationery.export.order') }}" class="bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-700 transition shadow-md flex items-center">
-                                    <i class="fas fa-file-excel mr-2 text-sm"></i> Export Order Barang
-                                </a>
-                            </div>
-
-                            <div class="overflow-x-auto p-5 bg-slate-50">
-                                <table class="w-full text-left border-collapse table-bordered whitespace-nowrap bg-white shadow-sm rounded-xl overflow-hidden">
-                                    <thead class="bg-blue-50 text-blue-800 text-[10px] uppercase tracking-wider font-black border-b-2 border-blue-200">
-                                        <tr>
-                                            <th class="p-3.5 text-center">Barang</th>
-                                            <th class="p-3.5 text-center">Stock Now</th>
-                                            <th class="p-3.5">Rata-rata penggunaan / bulan & siapa penggunanya</th>
-                                            <th class="p-3.5 text-center">Kapan terakhir order</th>
-                                            <th class="p-3.5 text-center">Kebutuhan / Reorder</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($orderBarang as $item)
-                                        <tr class="text-xs font-bold text-slate-700 hover:bg-blue-50/50 transition border-b border-slate-100">
-                                            <td class="p-3.5 text-blue-700">{{ $item->kode }} - {{ $item->nama_barang }}</td>
-                                            <td class="p-3.5 text-center text-lg {{ $item->total_stok <= $item->min_stok ? 'text-red-600' : 'text-emerald-600' }}">{{ $item->total_stok }}</td>
-
-                                            <td class="p-3.5 text-slate-600">
-                                                <span class="text-orange-600 font-black">{{ $item->rata_penggunaan }} {{ $item->satuan }}</span> / bulan
-                                                <span class="text-[10px] text-slate-400 ml-1">(Berdasarkan data 30 hari terakhir)</span>
-                                                <br>
-                                                <span class="inline-block mt-1.5 text-[10px] font-black text-blue-700 bg-blue-100 px-3 py-1.5 rounded-full shadow-sm border border-blue-200 tracking-wide uppercase">
-                                                    <i class="fas fa-user-tag mr-1"></i> Pemakai: {{ $item->siapa_pengguna }}
-                                                </span>
-                                            </td>
-
-                                            <td class="p-3.5 text-center text-slate-500">
-                                                {{ $item->terakhir_order ? \Carbon\Carbon::parse($item->terakhir_order)->format('d M Y') : 'Belum pernah order' }}
-                                            </td>
-                                            <td class="p-3.5 text-center">
-                                                @if($item->status_reorder == 'Perlu order')
-                                                    <span class="bg-rose-100 text-rose-700 px-3.5 py-2 rounded-full text-[9px] uppercase font-black shadow-sm border border-rose-200 animate-pulse"><i class="fas fa-exclamation-triangle mr-1"></i> Perlu Order</span>
-                                                @else
-                                                    <span class="bg-emerald-100 text-emerald-700 px-3.5 py-2 rounded-full text-[9px] uppercase font-black shadow-sm border border-emerald-200"><i class="fas fa-check mr-1"></i> Aman</span>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        {{-- MODUL 2: PEMAKAIAN BARANG --}}
-                        <div class="glass-card flex-1 overflow-hidden flex flex-col border-t-4 border-rose-600 shadow-md rounded-2xl">
-                            <div class="px-7 py-5 border-b border-slate-100 bg-white flex flex-wrap justify-between items-center gap-4">
-                                <div>
-                                    <h3 class="text-sm font-black text-rose-800 uppercase tracking-widest">2️⃣ Pemakaian Barang (Barang Keluar)</h3>
-                                    <p class="text-[10px] font-bold text-slate-500 mt-1 tracking-wide">Tabel pencatatan riwayat pengambilan / pemakaian material</p>
-                                </div>
-                                <a href="{{ route('stationery.export.pemakaian') }}" class="bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-700 transition shadow-md flex items-center">
-                                    <i class="fas fa-file-excel mr-2 text-sm"></i> Export Pemakaian
-                                </a>
-                            </div>
-
-                            <div class="overflow-x-auto p-5 bg-slate-50">
-                                <table class="w-full text-left border-collapse table-bordered whitespace-nowrap bg-white shadow-sm rounded-xl overflow-hidden">
-                                    <thead class="bg-rose-50 text-rose-800 text-[10px] uppercase tracking-wider font-black border-b-2 border-rose-200">
-                                        <tr>
-                                            <th class="p-3.5 text-center">No PR (FPB)</th>
-                                            <th class="p-3.5 text-center">Tanggal PR</th>
-                                            <th class="p-3.5 text-center">Kode Barang</th>
-                                            <th class="p-3.5">Nama Material & Pemakai</th>
-                                            <th class="p-3.5 text-center">Jumlah</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($pemakaianBarang as $trx)
-                                        <tr class="text-xs font-bold text-slate-700 hover:bg-rose-50/50 transition border-b border-slate-100">
-                                            <td class="p-3.5 text-center font-black text-slate-600">{{ $trx->no_fpb ?? 'PR-' . $trx->id }}</td>
-                                            <td class="p-3.5 text-center text-slate-500">{{ \Carbon\Carbon::parse($trx->tanggal)->format('d-m-Y') }}</td>
-                                            <td class="p-3.5 text-center text-blue-600">{{ $trx->kode ?? '-' }}</td>
-
-                                            <td class="p-3.5">
-                                                {{ $trx->stationery->nama_barang ?? '-' }}
-                                                <span class="block text-[10px] text-slate-500 font-normal mt-1">
-                                                    <i class="fas fa-user-tag text-rose-400 mr-1"></i> Pemakai: <span class="font-bold text-slate-700">{{ $trx->dept ?? '-' }}</span>
-                                                </span>
-                                            </td>
-
-                                            <td class="p-3.5 text-center font-black text-rose-600 text-sm">{{ $trx->jumlah }} <span class="text-xs text-slate-500">{{ $trx->stationery->satuan ?? '' }}</span></td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
                     @endif
 
                     @if($isSuperAdmin)
@@ -1050,7 +768,7 @@
         function toggleSidebar() {
             const sidebar = document.getElementById('main-sidebar');
             const overlay = document.getElementById('sidebar-overlay');
-            const isMobile = window.innerWidth <= 1024;
+            const isMobile = window.innerWidth < 1024;
 
             if (isMobile) {
                 sidebar.classList.toggle('-translate-x-full');
@@ -1217,7 +935,7 @@
                 document.getElementById('btn-karyawan-penilaian').classList.add('active');
             }
 
-            if (window.innerWidth <= 1024) {
+            if (window.innerWidth < 1024) {
                 const sidebar = document.getElementById('main-sidebar');
                 if (sidebar && sidebar.classList.contains('translate-x-0')) {
                     toggleSidebar();
@@ -1264,7 +982,7 @@
                 }, 400);
             }
 
-            if(window.innerWidth <= 1024) {
+            if(window.innerWidth < 1024) {
                 const sidebar = document.getElementById('main-sidebar');
                 const overlay = document.getElementById('sidebar-overlay');
                 if(!sidebar.classList.contains('-translate-x-full')) {
@@ -1525,7 +1243,12 @@
 
             const storedTab = (() => {
                 try {
-                    return localStorage.getItem('lastDashboardTab');
+                    let tab = localStorage.getItem('lastDashboardTab');
+                    if (tab === 'closing-stationery') {
+                        localStorage.removeItem('lastDashboardTab');
+                        return null;
+                    }
+                    return tab;
                 } catch (e) {
                     return null;
                 }
@@ -1537,8 +1260,6 @@
                 const intTabs = ['input', 'rekap', 'pengajuan-spl', 'rekap-spl'];
                 if (h && intTabs.includes(h)) {
                     switchTab(h);
-                } else if (!h && storedTab && intTabs.includes(storedTab)) {
-                    switchTab(storedTab);
                 } else {
                     switchTab('input');
                 }
@@ -1546,15 +1267,11 @@
                 const outTabs = ['rekap-spl', 'lembur', 'input', 'rekap'];
                 if (h && outTabs.includes(h)) {
                     switchTab(h);
-                } else if (!h && storedTab && outTabs.includes(storedTab)) {
-                    switchTab(storedTab);
                 } else {
                     switchTab('rekap-spl');
                 }
             } else if (h && validTabs.includes(h)) {
                 switchTab(h);
-            } else if (!h && storedTab && validTabs.includes(storedTab)) {
-                switchTab(storedTab);
             } else {
                 if (isAdminStationery && !isSuperAdmin) {
                     switchTab('analitik-stationery');
@@ -2282,270 +1999,5 @@
                 }, 850);
             }
         });
-
-        window.updateStationeryChart = function(trigger) {
-            let monthFilter = document.getElementById('chartFilterBulan');
-            let dayFilter = document.getElementById('chartFilterHari');
-            let itemFilter = document.getElementById('chartFilterBarang');
-
-            if (trigger === 'bulan' && monthFilter.value !== '') dayFilter.value = '';
-            else if (trigger === 'hari' && dayFilter.value !== '') monthFilter.value = '';
-
-            let month = monthFilter ? monthFilter.value : '';
-            let day = dayFilter ? dayFilter.value : '';
-
-            let rawItemValue = itemFilter ? itemFilter.value : '';
-            let isSpecificItem = !isNaN(rawItemValue) && rawItemValue.trim() !== '';
-
-            let sortMode = 'top5';
-
-            let priceMap = {};
-            masterData.forEach(m => {
-                let rawHarga = String(m.harga_unit || m.harga_satuan || m.harga || '0');
-                priceMap[m.id] = parseFloat(rawHarga.replace(/[^0-9]/g, '')) || 0;
-            });
-
-            let totalIn = 0, totalOut = 0, nominalPemakaian = 0;
-            let aggregatedOutQty = {};
-            let aggregatedOutFreq = {};
-            let activeItems = new Set();
-
-            if (!isSpecificItem) {
-                masterData.forEach(m => {
-                    aggregatedOutQty[m.nama_barang] = { qty: 0, satuan: m.satuan || 'Unit' };
-                    aggregatedOutFreq[m.nama_barang] = 0;
-                });
-            }
-
-            let filteredTrx = rawTrxData.filter(trx => {
-                if (!trx.tanggal) return false;
-                let dateOnly = String(trx.tanggal).split(' ')[0] || '';
-                let trxMonth = dateOnly.includes('-') ? dateOnly.split('-')[1] : '';
-                let matchMonth = (month === '' || trxMonth === month);
-                let matchDay = (day === '' || dateOnly === day);
-                return matchMonth && matchDay;
-            });
-
-            filteredTrx.forEach(trx => {
-                activeItems.add(trx.stationery_id);
-                let qty = parseFloat(trx.jumlah) || 0;
-
-                if(trx.type && trx.type.toLowerCase() === 'masuk') {
-                    totalIn += qty;
-                } else if (trx.type && trx.type.toLowerCase() === 'keluar') {
-                    totalOut += qty;
-                    nominalPemakaian += (qty * (priceMap[trx.stationery_id] || 0));
-
-                    if(!isSpecificItem || trx.stationery_id == rawItemValue) {
-                        let name = trx.stationery ? trx.stationery.nama_barang : 'Barang Dihapus';
-                        let satuan = trx.stationery ? trx.stationery.satuan : 'Unit';
-                        if(aggregatedOutQty[name] === undefined) {
-                            aggregatedOutQty[name] = { qty: 0, satuan: satuan };
-                            aggregatedOutFreq[name] = 0;
-                        }
-                        aggregatedOutQty[name].qty += qty;
-                        aggregatedOutFreq[name] += 1;
-                    }
-                }
-            });
-
-            let totalAsetGudang = 0, stokHabis = 0;
-            masterData.forEach(m => {
-                let stok = parseFloat(m.total_stok || m.stok || 0);
-                totalAsetGudang += (stok * (priceMap[m.id] || 0));
-                if(stok <= 0) stokHabis++;
-            });
-
-            let displayBarangCount = (month === '' && day === '') ? masterData.length : activeItems.size;
-
-            if(document.getElementById('stat-total-barang')) document.getElementById('stat-total-barang').innerText = displayBarangCount;
-            if(document.getElementById('stat-total-in')) document.getElementById('stat-total-in').innerText = totalIn;
-            if(document.getElementById('stat-total-out')) document.getElementById('stat-total-out').innerText = totalOut;
-            if(document.getElementById('stat-stok-habis')) document.getElementById('stat-stok-habis').innerText = stokHabis;
-            if (month !== '' || day !== '') {
-                if(document.getElementById('title-aset')) document.getElementById('title-aset').innerText = "NILAI PEMAKAIAN (KELUAR)";
-                if(document.getElementById('stat-total-aset')) document.getElementById('stat-total-aset').innerText = 'Rp ' + nominalPemakaian.toLocaleString('id-ID');
-            } else {
-                if(document.getElementById('title-aset')) document.getElementById('title-aset').innerText = "NILAI ASET STOK TOTAL";
-                if(document.getElementById('stat-total-aset')) document.getElementById('stat-total-aset').innerText = 'Rp ' + totalAsetGudang.toLocaleString('id-ID');
-            }
-
-            let sortedDataQty = Object.keys(aggregatedOutQty).map(key => ({ name: key, qty: aggregatedOutQty[key].qty, satuan: aggregatedOutQty[key].satuan }));
-            if (isSpecificItem) sortedDataQty.sort((a, b) => b.qty - a.qty);
-            else sortedDataQty = sortedDataQty.filter(d => d.qty > 0).sort((a, b) => b.qty - a.qty).slice(0, 5);
-
-            let sortedDataFreq = Object.keys(aggregatedOutFreq).map(key => ({ name: key, freq: aggregatedOutFreq[key] }));
-            if (isSpecificItem) sortedDataFreq.sort((a, b) => b.freq - a.freq);
-            else sortedDataFreq = sortedDataFreq.filter(d => d.freq > 0).sort((a, b) => b.freq - a.freq).slice(0, 5);
-
-            let totalQtySum = sortedDataQty.reduce((sum, d) => sum + d.qty, 0);
-            if (sortedDataQty.length === 0 || totalQtySum === 0) {
-                sortedDataQty = [{ name: 'Belum ada data', qty: 1, satuan: '' }];
-            }
-
-            let totalFreqSum = sortedDataFreq.reduce((sum, d) => sum + d.freq, 0);
-            if (sortedDataFreq.length === 0 || totalFreqSum === 0) {
-                sortedDataFreq = [{ name: 'Belum ada data', freq: 1 }];
-            }
-
-            const paletteQty = ['#38bdf8', '#fb7185', '#fbbf24', '#34d399', '#a78bfa', '#60a5fa', '#f472b6', '#fcd34d'];
-            const paletteFreq = ['#818cf8', '#34d399', '#f87171', '#fbbf24', '#c084fc', '#38bdf8', '#fb7185', '#a3e635'];
-
-            const listQtyEl = document.getElementById('listTopKuantitas');
-            const listFreqEl = document.getElementById('listTopFrekuensi');
-
-            if (listQtyEl) {
-                listQtyEl.innerHTML = '';
-                sortedDataQty.forEach((item, idx) => {
-                    if (item.name !== 'Belum ada data') {
-                        let color = paletteQty[idx % paletteQty.length];
-                        listQtyEl.innerHTML += `
-                            <li class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100 hover:shadow-md transition">
-                                <div class="flex items-center gap-3">
-                                    <span class="w-7 h-7 rounded-full flex items-center justify-center text-white text-[11px] font-black shadow-sm" style="background-color: ${color}">${idx + 1}</span>
-                                    <span class="font-extrabold text-slate-700 text-xs">${item.name}</span>
-                                </div>
-                                <span class="font-black text-blue-700 text-sm bg-blue-100 px-3 py-1 rounded-lg">${item.qty} <span class="text-[9px] text-blue-500 font-bold uppercase tracking-widest">${item.satuan}</span></span>
-                            </li>
-                        `;
-                    } else {
-                        listQtyEl.innerHTML = `<li class="text-center text-slate-400 text-xs py-4 font-medium italic">Belum ada data transaksi</li>`;
-                    }
-                });
-            }
-
-            if (listFreqEl) {
-                listFreqEl.innerHTML = '';
-                sortedDataFreq.forEach((item, idx) => {
-                    if (item.name !== 'Belum ada data') {
-                        let color = paletteFreq[idx % paletteFreq.length];
-                        listFreqEl.innerHTML += `
-                            <li class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100 hover:shadow-md transition">
-                                <div class="flex items-center gap-3">
-                                    <span class="w-7 h-7 rounded-full flex items-center justify-center text-white text-[11px] font-black shadow-sm" style="background-color: ${color}">${idx + 1}</span>
-                                    <span class="font-extrabold text-slate-700 text-xs">${item.name}</span>
-                                </div>
-                                <span class="font-black text-indigo-700 text-sm bg-indigo-100 px-3 py-1 rounded-lg">${item.freq} <span class="text-[9px] text-indigo-500 font-bold uppercase tracking-widest">Kali</span></span>
-                            </li>
-                        `;
-                    } else {
-                        listFreqEl.innerHTML = `<li class="text-center text-slate-400 text-xs py-4 font-medium italic">Belum ada data transaksi</li>`;
-                    }
-                });
-            }
-
-            if(statChartInstance) { statChartInstance.destroy(); statChartInstance = null; }
-            if(statFreqChartInstance) { statFreqChartInstance.destroy(); statFreqChartInstance = null; }
-
-            const wrapperQty = document.getElementById('wrapperQty');
-            const wrapperFreq = document.getElementById('wrapperFreq');
-
-            if(!wrapperQty || !wrapperFreq) return;
-
-            wrapperQty.innerHTML = '<canvas id="stationeryOutChart" class="w-full h-full"></canvas>';
-            wrapperFreq.innerHTML = '<canvas id="stationeryFreqChart" class="w-full h-full"></canvas>';
-
-            const canvasQty = document.getElementById('stationeryOutChart').getContext('2d');
-            const canvasFreq = document.getElementById('stationeryFreqChart').getContext('2d');
-
-            try {
-                statChartInstance = new Chart(canvasQty, {
-                    type: 'pie',
-                    data: {
-                        labels: sortedDataQty.map(d => d.name),
-                        datasets: [{
-                            data: sortedDataQty.map(d => d.qty),
-                            backgroundColor: sortedDataQty.map((_, i) => sortedDataQty[0].name === 'Belum ada data' ? '#e2e8f0' : paletteQty[i % paletteQty.length]),
-                            borderWidth: 2, borderColor: '#ffffff', hoverOffset: 10
-                        }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false, animation: { duration: 800 },
-                        layout: { padding: 20 },
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'right',
-                                labels: { usePointStyle: true, pointStyle: 'circle', boxWidth: 8, font: { weight: 'bold', size: 11, family: "'Plus Jakarta Sans', sans-serif" }, padding: 15 }
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(15, 23, 42, 0.96)', titleFont: { size: 13, weight: 'bold' }, bodyFont: { size: 12, weight: '500' },
-                                padding: 10, cornerRadius: 8, displayColors: true, boxPadding: 5,
-                                callbacks: { label: (context) => context.label === 'Belum ada data' ? ' 0 Unit' : ` ${context.raw} Unit Terpakai` }
-                            },
-                            datalabels: {
-                                display: function(context) {
-                                    return context.dataset.data[context.dataIndex] > 0;
-                                },
-                                color: '#ffffff',
-                                align: 'center',
-                                anchor: 'center',
-                                font: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: 'bold' },
-                                textAlign: 'center',
-                                textStrokeColor: 'rgba(0,0,0,0.4)',
-                                textStrokeWidth: 3,
-                                formatter: (value, context) => {
-                                    if (context.chart.data.labels[context.dataIndex] === 'Belum ada data') return '';
-                                    let dataArr = context.chart.data.datasets[0].data;
-                                    let sum = dataArr.reduce((a, b) => a + b, 0);
-                                    let percentage = (value * 100 / sum).toFixed(1) + "%";
-                                    let satuan = sortedDataQty[context.dataIndex].satuan || '';
-                                    return value + " " + satuan + "\n(" + percentage + ")";
-                                }
-                            }
-                        }
-                    }
-                });
-            } catch(e) { console.error("Error drawing Qty Chart:", e); }
-
-            try {
-                statFreqChartInstance = new Chart(canvasFreq, {
-                    type: 'pie',
-                    data: {
-                        labels: sortedDataFreq.map(d => d.name),
-                        datasets: [{
-                            data: sortedDataFreq.map(d => d.freq),
-                            backgroundColor: sortedDataFreq.map((_, i) => sortedDataFreq[0].name === 'Belum ada data' ? '#e2e8f0' : paletteFreq[i % paletteFreq.length]),
-                            borderWidth: 2, borderColor: '#ffffff', hoverOffset: 10
-                        }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false, animation: { duration: 800 },
-                        layout: { padding: 20 },
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'right',
-                                labels: { usePointStyle: true, pointStyle: 'circle', boxWidth: 8, font: { weight: 'bold', size: 11, family: "'Plus Jakarta Sans', sans-serif" }, padding: 15 }
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(15, 23, 42, 0.96)', titleFont: { size: 13, weight: 'bold' }, bodyFont: { size: 12, weight: '500' },
-                                padding: 10, cornerRadius: 8, displayColors: true, boxPadding: 5,
-                                callbacks: { label: (context) => context.label === 'Belum ada data' ? ' 0 Kali' : ` ${context.raw} Kali Pengambilan` }
-                            },
-                            datalabels: {
-                                display: function(context) {
-                                    return context.dataset.data[context.dataIndex] > 0;
-                                },
-                                color: '#ffffff',
-                                align: 'center',
-                                anchor: 'center',
-                                font: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: 'bold' },
-                                textAlign: 'center',
-                                textStrokeColor: 'rgba(0,0,0,0.4)',
-                                textStrokeWidth: 3,
-                                formatter: (value, context) => {
-                                    if (context.chart.data.labels[context.dataIndex] === 'Belum ada data') return '';
-                                    let dataArr = context.chart.data.datasets[0].data;
-                                    let sum = dataArr.reduce((a, b) => a + b, 0);
-                                    let percentage = (value * 100 / sum).toFixed(1) + "%";
-                                    return value + " Kali\n(" + percentage + ")";
-                                }
-                            }
-                        }
-                    }
-                });
-            } catch(e) { console.error("Error drawing Freq Chart:", e); }
-        };
-    </script>
+            </script>
 </x-app-layout>

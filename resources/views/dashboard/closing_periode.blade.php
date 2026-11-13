@@ -1,27 +1,3 @@
-<style>
-    /* ======================================================================
-       JURUS PAMUNGKAS ANTI-MELOROT (ABSOLUTE OVERRIDE)
-       ======================================================================
-       CSS ini akan memaksa tab Closing Periode untuk "lepas" dari
-       antrian flexbox yang rusak dan menempel paksa di posisi paling atas!
-    */
-    #tab-closing-stationery.flex {
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
-        z-index: 50 !important;
-        background-color: #f8fafc !important;
-        padding: 1.75rem !important;
-        margin: 0 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        height: 100% !important;
-        overflow-y: auto !important;
-    }
-</style>
-
 <div class="w-full flex flex-col gap-6 pb-10">
 
     {{-- =======================================================

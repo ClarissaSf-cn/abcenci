@@ -84,7 +84,6 @@
         ->get();
 @endphp
 
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -269,22 +268,7 @@
     @endforeach
 </datalist>
 
-<main class="flex-1 overflow-y-auto p-4 md:p-5 relative flex flex-col min-h-0">
-    <div class="max-w-full mx-auto w-full flex-1 flex flex-col min-h-0">
-
-        @if(!$isAdminStationery)
-            @include('dashboard.ringkasan')
-        @endif
-
-        @if($isSuperAdmin || $isStandar || $isAdminAbsensi)
-            @include('dashboard.karyawan')
-            @include('dashboard.input')
-            @include('dashboard.input_lembur')
-            @include('dashboard.rekap')
-            @include('dashboard.lembur')
-        @endif
-
-        @if($isSuperAdmin || $isAdminStationery)
+@if($isSuperAdmin || $isAdminStationery)
 
         {{-- TAB ANALITIK STATIONERY --}}
         <div id="tab-analitik-stationery" class="tab-content hidden flex-1 flex-col gap-4 overflow-hidden min-h-0">
@@ -1058,15 +1042,6 @@
         </div>
 
         @endif
-
-        @if($isSuperAdmin)
-            @include('dashboard.users')
-        @endif
-
-    </div>
-</main>
-
-@include('dashboard.modals')
 
 {{-- Include Modal Edit Pemakaian --}}
 @include('dashboard.modalEditPemakaian')
